@@ -4,7 +4,9 @@ function Home() {
 
         <>
 
-        <Products />
+            <div className="w-full py-2 px-10">
+                <Products />
+            </div>
             
         </>
     );
