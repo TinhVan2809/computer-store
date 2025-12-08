@@ -1,5 +1,7 @@
-
+import {useNavigate } from "react-router-dom";
 function Navbar() {
+    const navigate = useNavigate();
+
     const li = "text-stone-900 text-sm md:text-base cursor-pointer flex justify-center items-center rounded-[20px] px-2 py-1 transition duration-400 ease-in-out hover:bg-gray-800 hover:text-white";
     
     return(
@@ -14,7 +16,7 @@ function Navbar() {
                     {/* Menu */}
                     <div className="hidden md:flex justify-start items-center">
                         <ul className="flex justify-center items-center gap-4 md:gap-10">
-                            <li className={li}>Home</li>
+                            <li className={li} onClick={() => navigate('/')}>Home</li>
                             <li className={li}>Product <i className="ri-arrow-drop-down-line"></i></li>
                             <li className={li}>Resources <i className="ri-arrow-drop-down-line"></i></li>
                             <li className={li}>Contact</li>

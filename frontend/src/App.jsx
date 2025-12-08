@@ -17,13 +17,13 @@ function App() {
 
   return (
     <>
-    <Navbar />
-
     <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/detail/:product_id" element={<Detail />} />
-        </Routes>
+      <Navbar />
+
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/detail/:product_id" element={<Detail />} />
+      </Routes>
     </BrowserRouter>
   </>
   );
