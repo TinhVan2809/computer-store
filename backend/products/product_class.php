@@ -77,7 +77,7 @@
             try{
                 $db = Database::getInstance();
                 $connection = $db->getConnection();
-                $sql = "SELECT p.product_id, p.product_name, p.product_price, p.product_quantity, 
+                $sql = "SELECT p.product_id, p.product_name, p.product_price, p.product_quantity, p.product_sale,
                                p.product_description, p.product_created_at, p.image_main, 
                                COALESCE(AVG(v.rating), 0) AS rating, 
                                m.manufacturer_name
@@ -119,18 +119,23 @@
         * Add a new product (optimized with image upload)
         * @param string $product_name - Product name (required)
         * @param float $product_price - Product price (required)
+        * @param float $product_sale -product sale
         * @param string $product_quantity - Product quantity (optional)
         * @param string $product_description - Product description (optional)
         * @param int $manufacturer_id - Manufacturer ID (optional)
         * @param array $image_file - $_FILES['image_main'] (optional)
         * @return int|false - Inserted product ID or false
         */
-       public function addProduct($product_name, $product_price, $product_quantity = '0', $product_description = '', $manufacturer_id = null, $image_file = null) {
+       public function addProduct($product_name, $product_price, $product_quantity = '0', $product_description = '', $product_sale = '0', $manufacturer_id = null, $image_file = null) {
 
             $product_name = trim((string)$product_name);
             $product_price = (float)$product_price;
             $product_quantity = trim((string)$product_quantity);
             $product_description = trim((string)$product_description);
+            // Ensure sale is numeric and clamp to reasonable range (0-100)
+            $product_sale = is_numeric($product_sale) ? (float)$product_sale : 0.0;
+            if ($product_sale < 0) $product_sale = 0.0;
+            if ($product_sale > 100) $product_sale = 100.0;
             $manufacturer_id = $manufacturer_id !== null ? (int)$manufacturer_id : null;
 
             if ($product_name === '' || $product_price < 0) {
@@ -151,8 +156,8 @@
                     }
                 }
 
-                $sql = "INSERT INTO products (product_name, product_price, product_quantity, product_description, manufacturer_id, image_main, product_created_at)
-                        VALUES (:product_name, :product_price, :product_quantity, :product_description, :manufacturer_id, :image_main, NOW())";
+                $sql = "INSERT INTO products (product_name, product_price, product_quantity, product_description, manufacturer_id, image_main, product_created_at, product_sale)
+                        VALUES (:product_name, :product_price, :product_quantity, :product_description, :manufacturer_id, :image_main, NOW(), :product_sale)";
 
                 $stmt = $connection->prepare($sql);
 
@@ -161,6 +166,7 @@
                 $stmt->bindValue(':product_quantity', $product_quantity, PDO::PARAM_STR);
                 $stmt->bindValue(':product_description', $product_description, PDO::PARAM_STR);
                 $stmt->bindValue(':image_main', $image_main, PDO::PARAM_STR);
+                $stmt->bindValue(':product_sale', $product_sale, PDO::PARAM_STR);
 
                 if ($manufacturer_id === null) {
                     $stmt->bindValue(':manufacturer_id', null, PDO::PARAM_NULL);
@@ -284,17 +290,19 @@
         * @param float $product_price - Product price
         * @param string $product_quantity - Product quantity
         * @param string $product_description - Product description
+        * @param float $product_sale = Product sale
         * @param int $manufacturer_id - Manufacturer ID (optional)
         * @param array $image_file - $_FILES['image_main'] (optional, replaces old image)
         * @return bool - true on success, false on failure
         */
-       public function updateProduct($product_id, $product_name, $product_price, $product_quantity = '0', $product_description = '', $manufacturer_id = null, $image_file = null) {
+       public function updateProduct($product_id, $product_name, $product_price, $product_quantity = '0', $product_description = '', $product_sale = '0', $manufacturer_id = null, $image_file = null) {
             
             $product_id = (int)$product_id;
             $product_name = trim((string)$product_name);
             $product_price = (float)$product_price;
             $product_quantity = trim((string)$product_quantity);
             $product_description = trim((string)$product_description);
+            $product_sale = (float)$product_sale;
             $manufacturer_id = $manufacturer_id !== null ? (int)$manufacturer_id : null;
 
             if ($product_id <= 0 || $product_name === '' || $product_price < 0) {
@@ -338,6 +346,7 @@
                             product_price = :product_price,
                             product_quantity = :product_quantity,
                             product_description = :product_description,
+                            product_sale = :product_sale,
                             manufacturer_id = :manufacturer_id,
                             image_main = :image_main,
                             product_update_at = NOW()
@@ -350,6 +359,7 @@
                 $stmt->bindValue(':product_price', $product_price);
                 $stmt->bindValue(':product_quantity', $product_quantity, PDO::PARAM_STR);
                 $stmt->bindValue(':product_description', $product_description, PDO::PARAM_STR);
+                $stmt->bindValue(':product_sale', $product_sale, PDO::PARAM_STR);
                 $stmt->bindValue(':image_main', $newImageFilename, PDO::PARAM_STR);
 
                 if ($manufacturer_id === null) {
@@ -358,7 +368,12 @@
                     $stmt->bindValue(':manufacturer_id', $manufacturer_id, PDO::PARAM_INT);
                 }
 
-                return $stmt->execute();
+                $execResult = $stmt->execute();
+                if ($execResult === false) {
+                    $err = $stmt->errorInfo();
+                    error_log("Error Updating Product - SQLSTATE: {$err[0]} Code: {$err[1]} Message: {$err[2]}");
+                }
+                return $execResult;
 
             } catch(PDOException $e) {
                 error_log("Error Updating Product: " . $e->getMessage());

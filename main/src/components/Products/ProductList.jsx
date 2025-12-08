@@ -42,7 +42,7 @@ function ProductList({ products, onEdit, onDelete }) {
                 </td>
                 <td>
                   <span className="price">
-                    {parseFloat(product.product_price).toLocaleString('vi-VN')} ₫
+                    ${parseFloat(product.product_price).toLocaleString('en-EN')}
                   </span>
                 </td>
                 <td>

@@ -187,6 +187,7 @@ function Products() {
   return (
     <>
     <NavLink to='/'>Home</NavLink>
+    
     <div className="products-container">
       <div className="products-header">
         <h1>Quản lý Sản Phẩm</h1>

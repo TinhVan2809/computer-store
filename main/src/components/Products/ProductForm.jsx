@@ -6,6 +6,7 @@ function ProductForm({ onSave, onCancel, editingId, manufacturers }) {
     price: '',
     quantity: '0',
     description: '',
+    sale: '0',
     manufacturer_id: '',
     image_main: null
   });
@@ -39,6 +40,7 @@ function ProductForm({ onSave, onCancel, editingId, manufacturers }) {
           price: product.product_price || '',
           quantity: product.product_quantity || '0',
           description: product.product_description || '',
+          sale: product.product_sale || '0',
           manufacturer_id: product.manufacturer_id || '',
           image_main: null
         });
@@ -262,15 +264,16 @@ function ProductForm({ onSave, onCancel, editingId, manufacturers }) {
       submitFormData.append('price', formData.price);
       submitFormData.append('quantity', formData.quantity);
       submitFormData.append('description', formData.description);
+      submitFormData.append('product_sale', formData.sale);
       submitFormData.append('manufacturer_id', formData.manufacturer_id);
 
       if (formData.image_main) {
         submitFormData.append('image_main', formData.image_main);
       }
 
-      // Append secondary images
-      secondaryImages.forEach((image, index) => {
-        submitFormData.append(`secondary_images`, image);
+      // Append secondary images using `images[]` so PHP receives an array
+      secondaryImages.forEach((image) => {
+        submitFormData.append('images[]', image);
       });
 
       onSave(submitFormData);
@@ -328,6 +331,24 @@ function ProductForm({ onSave, onCancel, editingId, manufacturers }) {
             className={errors.quantity ? 'input-error' : ''}
           />
           {errors.quantity && <span className="error-message">{errors.quantity}</span>}
+        </div>
+        
+        <div className="form-group">
+          <label htmlFor="sale">Sale</label>
+         <div className="sale-input">
+           <input
+            type="text"
+            id="sale"
+            name="sale"
+            value={formData.sale}
+            onChange={handleInputChange}
+            placeholder="0"
+            className={errors.sale ? 'input-error' : ''}
+          />
+          <span>%</span>
+         </div>
+          
+          {errors.sale && <span className="error-message">{errors.sale}</span>}
         </div>
 
         <div className="form-group">

@@ -99,6 +99,7 @@ try {
             $description = $_POST['description'] ?? '';
             $manufacturer_id = $_POST['manufacturer_id'] ?? null;
             $imageFile = $_FILES['image_main'] ?? null;
+            $sale = $_POST['product_sale'] ?? '0';
 
             if (empty($name) || empty($price)) {
                 sendJson(['success' => false, 'message' => 'Product name and price required'], 400);
@@ -108,7 +109,8 @@ try {
                 sendJson(['success' => false, 'message' => 'Price must be a valid positive number'], 400);
             }
 
-            $result = $productObj->addProduct($name, $price, $quantity, $description, $manufacturer_id, $imageFile);
+            // Note: addProduct signature expects ($name, $price, $quantity, $description, $product_sale, $manufacturer_id, $image_file)
+            $result = $productObj->addProduct($name, $price, $quantity, $description, $sale, $manufacturer_id, $imageFile);
 
             if ($result) {
                 sendJson([
@@ -133,6 +135,7 @@ try {
             $description = $_POST['description'] ?? '';
             $manufacturer_id = $_POST['manufacturer_id'] ?? null;
             $imageFile = $_FILES['image_main'] ?? null;
+            $sale = $_POST['product_sale'] ?? '0';
 
             if (!$id || empty($name) || empty($price)) {
                 sendJson(['success' => false, 'message' => 'Product ID, name, and price required'], 400);
@@ -142,7 +145,8 @@ try {
                 sendJson(['success' => false, 'message' => 'Price must be a valid positive number'], 400);
             }
 
-            $result = $productObj->updateProduct($id, $name, $price, $quantity, $description, $manufacturer_id, $imageFile);
+            // Note: updateProduct signature expects ($id, $name, $price, $quantity, $description, $product_sale, $manufacturer_id, $image_file)
+            $result = $productObj->updateProduct($id, $name, $price, $quantity, $description, $sale, $manufacturer_id, $imageFile);
 
             if ($result) {
                 sendJson(['success' => true, 'message' => 'Product updated successfully']);

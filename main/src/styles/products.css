@@ -171,6 +171,19 @@
   box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
 }
 
+.form-group .sale-input {
+  display: flex;
+  position: relative;
+  align-items: center;
+}
+
+.form-group .sale-input span {
+  position: absolute;
+  right: 10px;
+}
+
+
+
 .form-group input.input-error,
 .form-group textarea.input-error,
 .form-group select.input-error {
