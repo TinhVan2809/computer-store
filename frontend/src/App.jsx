@@ -22,7 +22,7 @@ function App() {
     <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/detail:product_id" element={<Detail />} />
+          <Route path="/detail/:product_id" element={<Detail />} />
         </Routes>
     </BrowserRouter>
   </>

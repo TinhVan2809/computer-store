@@ -1,4 +1,8 @@
+import {useNavigate} from 'react-router-dom';
+
 function ProductList( {products}) {
+
+    const navigate = useNavigate();
 
     return (
         <>
@@ -12,7 +16,7 @@ function ProductList( {products}) {
                                 const formatter = new Intl.NumberFormat('en-EN', { style: 'currency', currency: 'USD' });
 
                                 return (
-                                    <div className="relative p-2 w-[200px] h-[280px] border-gray-200 border rounded-[5px] flex flex-col justify-between items-center text-center cursor-pointer transition duration-300 ease-in-out hover:-translate-y-1" key={p.product_id}>
+                                    <div className="relative p-2 w-[200px] h-[280px] border-gray-200 border rounded-[5px] flex flex-col justify-between items-center text-center cursor-pointer transition duration-300 ease-in-out hover:-translate-y-1" key={p.product_id} onClick={() => navigate(`/detail/${p.product_id}`) }>
                                         <img className="w-full h[250px] object-cover" src={`http://localhost/computer-store/backend/uploads/products_img/${p.image_main}`} alt={p.product_name} title={p.product_name} />
                                         <div className="min-w-0">
                                                 <p className="truncate w-[150px]">{p.product_name}</p>
