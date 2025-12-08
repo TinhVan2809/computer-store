@@ -107,7 +107,7 @@ function ProductForm({ onSave, onCancel, editingId, manufacturers }) {
         newErrors.image_main = 'Kích thước ảnh không được vượt quá 5MB';
       }
 
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/jpg'];
       if (!allowedTypes.includes(formData.image_main.type)) {
         newErrors.image_main = 'Chỉ chấp nhận các định dạng: JPEG, PNG, WebP, GIF';
       }
@@ -116,7 +116,7 @@ function ProductForm({ onSave, onCancel, editingId, manufacturers }) {
     // Validate secondary images
     if (secondaryImages.length > 0) {
       const maxSize = 5 * 1024 * 1024;
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/jpg'];
       
       for (let i = 0; i < secondaryImages.length; i++) {
         const file = secondaryImages[i];

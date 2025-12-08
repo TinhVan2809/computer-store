@@ -44,8 +44,13 @@ function Detail() {
     return (
 
         <>
-           <h3>Raw JSON</h3>
-      <pre style={{ whiteSpace: 'pre-wrap' }}>{JSON.stringify(product, null, 2)}</pre>
+        <div className="">
+            <div className="">
+                <div className="">
+                    <img src={`http://localhost/computer-store/backend/uploads/products_img/${product.image_main}`} alt={product.product_name} title={product.product_name} />
+                </div>
+            </div>    
+        </div> 
         </>
     );
 }

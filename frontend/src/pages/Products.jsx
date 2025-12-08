@@ -38,6 +38,7 @@ function Products() {
     }
 
     fetchProductsData();
+   
    }, []);
 
    if(loading) {

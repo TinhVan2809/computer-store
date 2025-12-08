@@ -12,6 +12,7 @@ function handleCORS() {
         'http://127.0.0.1:3000',
         'http://127.0.0.1:5173',
         'http://localhost:80',
+        'http://localhost:5174',
     ];
 
     $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
@@ -196,6 +197,8 @@ try {
             }
 
             $product_id = $_POST['product_id'] ?? null;
+            error_log("DEBUG addSecondaryImages - product_id: " . var_export($product_id, true));
+            error_log("DEBUG addSecondaryImages - \$_FILES keys: " . implode(', ', array_keys($_FILES)));
 
             if (!$product_id || !is_numeric($product_id)) {
                 sendJson(['success' => false, 'message' => 'Valid product ID required'], 400);
@@ -210,11 +213,16 @@ try {
                 $fileKey = 'images[]';
             }
 
+            error_log("DEBUG addSecondaryImages - fileKey: " . var_export($fileKey, true));
+
             if ($fileKey !== null) {
                 // If multiple files were uploaded using images[] or images, PHP will present
                 // $_FILES[$fileKey]['name'] as an array. Normalize to an array of file arrays.
+                error_log("DEBUG addSecondaryImages - \$_FILES[$fileKey]['name']: " . var_export($_FILES[$fileKey]['name'], true));
+                
                 if (is_array($_FILES[$fileKey]['name'])) {
                     $fileCount = count($_FILES[$fileKey]['name']);
+                    error_log("DEBUG addSecondaryImages - fileCount: $fileCount");
                     for ($i = 0; $i < $fileCount; $i++) {
                         $uploadedFiles[] = [
                             'name' => $_FILES[$fileKey]['name'][$i],
@@ -230,11 +238,14 @@ try {
                 }
             }
 
+            error_log("DEBUG addSecondaryImages - uploadedFiles count: " . count($uploadedFiles));
+
             if (empty($uploadedFiles)) {
                 sendJson(['success' => false, 'message' => 'No images provided'], 400);
             }
 
             $result = $productObj->addSecondaryImages($product_id, $uploadedFiles);
+            error_log("DEBUG addSecondaryImages - result: " . var_export($result, true));
 
             if (!empty($result)) {
                 sendJson([

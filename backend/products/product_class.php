@@ -80,7 +80,7 @@
                 $sql = "SELECT p.product_id, p.product_name, p.product_price, p.product_quantity, p.product_sale,
                                p.product_description, p.product_created_at, p.image_main, 
                                COALESCE(AVG(v.rating), 0) AS rating, 
-                               m.manufacturer_name
+                               m.manufacturer_name, m.manufacturer_logo_image
                         FROM products p
                         LEFT JOIN votes v ON p.product_id = v.vote_id
                         LEFT JOIN manufacturers m ON p.manufacturer_id = m.manufacturer_id

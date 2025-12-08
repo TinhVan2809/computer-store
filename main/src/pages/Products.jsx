@@ -74,15 +74,15 @@ function Products() {
       let productId = editingId;
 
       for (let entry of entries) {
-        if (entry[0] === 'secondary_images') {
+        if (entry[0] === 'images[]') {
           secondaryImages.push(entry[1]);
         }
       }
 
-      // Remove secondary_images from formData (will be handled separately)
+      // Remove images[] from formData (will be handled separately)
       const cleanFormData = new FormData();
       for (let [key, value] of formData) {
-        if (key !== 'secondary_images') {
+        if (key !== 'images[]') {
           cleanFormData.append(key, value);
         }
       }
@@ -107,7 +107,6 @@ function Products() {
         // Upload secondary images if any
         if (secondaryImages.length > 0) {
           const imageFormData = new FormData();
-          imageFormData.append('action', 'addSecondaryImages');
           imageFormData.append('product_id', productId);
           
           secondaryImages.forEach((image) => {
@@ -116,7 +115,7 @@ function Products() {
           });
 
           try {
-            const imageResponse = await fetch(PRODUCTS_API, {
+            const imageResponse = await fetch(`${PRODUCTS_API}?action=addSecondaryImages`, {
               method: 'POST',
               body: imageFormData
             });
