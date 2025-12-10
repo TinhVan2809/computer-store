@@ -60,7 +60,7 @@ class Manufacturers_class {
         }
 
         // Validate MIME type
-        $allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+        $allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', '/image/avif'];
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $mimeType = finfo_file($finfo, $file['tmp_name']);
         finfo_close($finfo);

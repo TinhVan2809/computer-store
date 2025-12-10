@@ -1,4 +1,5 @@
 import {useNavigate} from 'react-router-dom';
+import '../../styles/Products.css'
 
 function ProductList( {products}) {
 
@@ -25,13 +26,13 @@ function ProductList( {products}) {
                   onClick={() => navigate(`/detail/${p.product_id}`)}
                 >
                   <img
-                    className="w-full h-[200px] min-h-[200px] object-cover"
+                    className="w-full h-[200px] min-h-[200px] max-h-[200px] object-contain"
                     src={`http://localhost/computer-store/backend/uploads/products_img/${p.image_main}`}
                     alt={p.product_name}
                     title={p.product_name}
                   />
                   <div className="flex flex-col w-full justify-center items-center text-center mt-2">
-                    <div className="absolute top-0 right-0 bg-red-600 px-2 rounded-bl-md">
+                    <div className={`${saleClamped <= 0 ? 'sale-none' : 'absolute top-0 right-0 bg-red-600 px-2 rounded-bl-md'}`}>
                       <span className="text-[12px] text-white">
                         {saleClamped} <sup>%</sup>
                       </span>

@@ -2,8 +2,15 @@
 
 #Intel {
     background-color: #0168b4;
+    color: white !important;
 }
 
 #AMD {
     background-color: #fb2c36;
+    color: white !important;
+}
+
+#Keychron {
+    background-color: #000;
+    color: white;
 }

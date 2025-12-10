@@ -54,7 +54,7 @@ function Detail() {
     if (error) return <div className="error">Something went wrong: {error}</div>;
     if (!product) return <div>No data.</div>;
     
-    const price = Number(product.product_price) || 0;
+              const price = Number(product.product_price) || 0;
               const sale = Number(product.product_sale) || 0;
               const saleClamped = Math.max(0, Math.min(100, sale));
               const discounted = Math.max(0, price * (1 - saleClamped / 100));
@@ -68,13 +68,13 @@ function Detail() {
       <>
         <div className="w-full py-10">
           <div className="w-[1250px] max-w-[1250px] flex gap-10 m-auto">
-            <div className="flex bg-gray-100 w-[50%] border-gray-50 border p-5 rounded-[10px]  ">
-              <div className="">
+            <div className="flex w-[50%] border-gray-50 border p-5 rounded-[10px]  ">
+              <div className="size-fit">
                 <img
                   src={`http://localhost/computer-store/backend/uploads/products_img/${product.image_main}`}
                   alt={product.product_name}
                   title={product.product_name}
-                  className='w-[500px] h-[500px] object-center'
+                  className='w-[500px] h-[500px] object-contain'
                 />
               </div>
               <div className="flex flex-col gap-1 h-full overflow-y-auto">
@@ -115,7 +115,7 @@ function Detail() {
                             <div className="flex flex-col gap-2 items-end justify-start ">
                                 <div className="flex justify-center items-center text-center gap-2 w-full">
                                     <span className="line-through text-gray-400 text-[14px]"> {formatter.format(price)} </span>
-                                    <span id={`${product.manufacturer_name}`} className='rounded-[7px] text-white px-1 text-[12px]'>{product.product_sale} <sup>%</sup> Sale</span> 
+                                    <span id={`${product.manufacturer_name}`} className='rounded-[7px] text-black px-1 text-[12px]'>{product.product_sale} <sup>%</sup> Sale</span> 
                                 </div> 
 
                                 <div className="w-full">
@@ -124,7 +124,7 @@ function Detail() {
                             </div>
                             </>
                         ) : (
-                            <span>{formatter.format(price)}</span>
+                            <span className='text-[24px] font-medium'>{formatter.format(price)}</span>
                         )}
                     </div>
                   <div className="flex justify-start items-center absolute bottom-0 py-2 gap-3 w-full">

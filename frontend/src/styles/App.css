@@ -9,3 +9,12 @@
 body {
     font-family: "Roboto", sans-serif;
 }
+
+body::-webkit-scrollbar{
+    width: 6px;
+}
+
+body::-webkit-scrollbar-thumb{
+    background-color: #000;
+    border-radius: 24px;
+}
