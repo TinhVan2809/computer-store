@@ -26,7 +26,7 @@ function Navbar() {
 
                     {/* User Info */}
                     <div className="flex justify-between items-center gap-6 cursor-pointe p-1 px-2 bg-gray-100 rounded-[20px] transition duration-500 shrink-0">
-                        <i className="ri-user-line text-[20px] cursor-pointer transition duration-200 bg-white   px-1.5 rounded-[50%]"></i>
+                        <i className="ri-user-line text-[20px] cursor-pointer transition duration-200 bg-white px-1.5 rounded-[50%]" onClick={() => navigate('/login')}></i>
                         <i className="fa-regular fa-bell text-[20px] cursor-pointer transition duration-200"></i>
                         <i className="ri-shopping-cart-2-line text-[20px] cursor-pointer transition duration-200"></i>
                     </div>

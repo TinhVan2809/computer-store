@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+.btn {
+   /* ensure the arrow can move without affecting layout */
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+   position: relative;
+}
+
+.btn .arrow {
+   display: inline-block;
+   /* prefer transform for smooth motion */
+   transform: translateX(0);
+   transition: transform 200ms ease-in-out;
+   margin-left: 8px;
+}
+
+.btn:hover .arrow {
+   /* move arrow to the right on hover; adjust px value to taste */
+   transform: translateX(6px);
+}
+
+input[type="checkbox"] {
+      accent-color: black;
+}
+
+.btn-visit{
+    border: 2px solid transparent;
+}
+
+.btn-visit:hover {
+    background-color: #fff;
+    color: #272727;
+    border-color: #000;
+}

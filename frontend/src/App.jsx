@@ -8,6 +8,7 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import Home from './pages/Home';
 import Navbar from './components/Navbar';
 import Detail from './pages/Detail';
+import Login from './pages/Login';
 
 //STYLES
 import './styles/navbar.css';
@@ -23,6 +24,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/detail/:product_id" element={<Detail />} />
+        <Route path='/login'element={<Login />}/>
       </Routes>
     </BrowserRouter>
   </>

@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+#Intel {
+    background-color: #0168b4;
+}
+
+#AMD {
+    background-color: #fb2c36;
+}

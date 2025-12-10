@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
+import '../styles/Detail.css';
+
 const API_BASE = 'http://localhost/computer-store/backend/products/product_api_endpoint.php';
 function Detail() {
     const { product_id } = useParams();
@@ -48,9 +50,9 @@ function Detail() {
         return () => controller.abort();
     }, [product_id]);
 
-    if (loading) return <div>Đang tải...</div>;
-    if (error) return <div className="error">Lỗi: {error}</div>;
-    if (!product) return <div>Không có dữ liệu sản phẩm</div>;
+    if (loading) return <div>Loading...</div>;
+    if (error) return <div className="error">Something went wrong: {error}</div>;
+    if (!product) return <div>No data.</div>;
     
     const price = Number(product.product_price) || 0;
               const sale = Number(product.product_sale) || 0;
@@ -65,7 +67,7 @@ function Detail() {
         
       <>
         <div className="w-full py-10">
-          <div className="w-[1250px] flex gap-10 m-auto">
+          <div className="w-[1250px] max-w-[1250px] flex gap-10 m-auto">
             <div className="flex bg-gray-100 w-[50%] border-gray-50 border p-5 rounded-[10px]  ">
               <div className="">
                 <img
@@ -87,10 +89,13 @@ function Detail() {
                 ))}
               </div>
             </div>
-            <div className="">
-                <div className="flex flex-col gap-2">
-                    <div className='flex flex-col gap-1 justify-start items-start'>
-                        <p className='text-[2rem]'>{product.product_name}</p>
+            <div className="w-[50%] relative">
+                <div className="flex w-full flex-col gap-2">
+                    <div className='flex w-full flex-col gap-1 justify-start items-start'>
+                        <div className="flex flex-col gap-0 w-full justify-start items-start text-start">
+                            <img className='w-auto h-3 object-cover' src={`http://localhost/computer-store/backend/uploads/manufacturers_img/${product.manufacturer_logo_image}`} alt={product.manufacturer_name} />
+                            <p className='text-[2rem]'>{product.product_name}</p>
+                        </div>
                         <div className="flex justify-start items-center gap-1">
                             <div className="">
                                 <i class="ri-star-s-fill"></i>
@@ -107,10 +112,10 @@ function Detail() {
                     <div className="w-full flex justify-start">
                         {saleClamped > 0 ? (
                             <>
-                            <div className="flex flex-col gap-2 items-end justify-start">
+                            <div className="flex flex-col gap-2 items-end justify-start ">
                                 <div className="flex justify-center items-center text-center gap-2 w-full">
                                     <span className="line-through text-gray-400 text-[14px]"> {formatter.format(price)} </span>
-                                    <span className='bg-red-500 rounded-[7px] text-white px-1 text-[12px]'>{product.product_sale} <sup>%</sup></span> 
+                                    <span id={`${product.manufacturer_name}`} className='rounded-[7px] text-white px-1 text-[12px]'>{product.product_sale} <sup>%</sup> Sale</span> 
                                 </div> 
 
                                 <div className="w-full">
@@ -122,7 +127,10 @@ function Detail() {
                             <span>{formatter.format(price)}</span>
                         )}
                     </div>
-                    {/* <div className=""></div> */}
+                  <div className="flex justify-start items-center absolute bottom-0 py-2 gap-3 w-full">
+                    <button className='p-3 border border-gray-300 w-[210px] rounded-[25px] cursor-pointer transition duration-500'><i class="fa-solid fa-cart-plus"></i>Add To Cart</button>
+                    <button className='p-3 border bg-stone-950 text-white w-[210px] rounded-[25px] cursor-pointer transition duration-300 hover:opacity-80'>Buy Now</button>
+                  </div>
                 </div>
             </div>
           </div>
