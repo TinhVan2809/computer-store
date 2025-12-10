@@ -18,6 +18,22 @@ class Users_class {
                 return [];
             }
     }
+     public function getCountUsers() {
+            try{
+                $db = Database::getInstance();
+                $connection = $db->getConnection();
+
+                $sql = "SELECT COUNT(*) AS total FROM users";
+                $count = $connection->prepare($sql);
+                $count->execute();
+                $row = $count->fetch(PDO::FETCH_ASSOC);
+                return isset($row['total']) ? (int)$row['total'] : 0;
+
+            } catch(PDOException $e) {
+                error_log("Error Count Users " . $e->getMessage());
+                return 0;
+            }
+       }
 }
 
 ?>

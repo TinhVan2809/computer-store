@@ -13,6 +13,7 @@ function handleCORS() {
         'http://127.0.0.1:5173',
         'http://localhost:80',
         'http://localhost:5174',
+        'http://localhost:5175',
     ];
 
     $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
