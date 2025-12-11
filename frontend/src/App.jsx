@@ -9,6 +9,7 @@ import Home from './pages/Home';
 import Navbar from './components/Navbar';
 import Detail from './pages/Detail';
 import Login from './pages/Login';
+import Carts from './pages/Carts';
 
 //STYLES
 import './styles/navbar.css';
@@ -25,6 +26,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/detail/:product_id" element={<Detail />} />
         <Route path='/login'element={<Login />}/>
+        <Route path='/cart/:user_id' element={<Carts />}></Route>
       </Routes>
     </BrowserRouter>
   </>

@@ -68,7 +68,7 @@ function Detail() {
       <>
         <div className="w-full py-10">
           <div className="w-[1250px] max-w-[1250px] flex gap-10 m-auto">
-            <div className="flex w-[50%] border-gray-50 border p-5 rounded-[10px]  ">
+            <div className="flex w-[50%] flex-col p-5  ">
               <div className="size-fit">
                 <img
                   src={`http://localhost/computer-store/backend/uploads/products_img/${product.image_main}`}
@@ -77,7 +77,7 @@ function Detail() {
                   className='w-[500px] h-[500px] object-contain'
                 />
               </div>
-              <div className="flex flex-col gap-1 h-full overflow-y-auto">
+              <div className="flex flex-wrap gap-1 h-full overflow-y-auto">
                 {existingSecondaryImages.map((img) => (
                     
                   <img
@@ -127,7 +127,7 @@ function Detail() {
                             <span className='text-[24px] font-medium'>{formatter.format(price)}</span>
                         )}
                     </div>
-                  <div className="flex justify-start items-center absolute bottom-0 py-2 gap-3 w-full">
+                  <div className="flex justify-start items-center bottom-0 py-2 gap-3 w-full">
                     <button className='p-3 border border-gray-300 w-[210px] rounded-[25px] cursor-pointer transition duration-500'><i class="fa-solid fa-cart-plus"></i>Add To Cart</button>
                     <button className='p-3 border bg-stone-950 text-white w-[210px] rounded-[25px] cursor-pointer transition duration-300 hover:opacity-80'>Buy Now</button>
                   </div>

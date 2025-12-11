@@ -7,8 +7,8 @@ function ProductList( {products}) {
 
     return (
       <>
-        <div className="w-full">
-          <div className="w-full flex justify-center items-centers gap-5">
+        <div className="product-container w-full p-5">
+          <div className="products w-full flex flex-wrap justify-start items-centers gap-10">
             {products.map((p) => {
               const price = Number(p.product_price) || 0;
               const sale = Number(p.product_sale) || 0;
@@ -21,7 +21,7 @@ function ProductList( {products}) {
 
               return (
                 <div
-                  className="relative w-[200px] h-[310px] border-gray-200 border flex flex-col justify-between items-center text-center cursor-pointer transition duration-300 ease-in-out hover:-translate-y-1"
+                  className="card relative w-[200px] h-[310px] border-gray-100 border flex flex-col justify-between items-center text-center cursor-pointer transition duration-300 ease-in-out hover:-translate-y-1"
                   key={p.product_id}
                   onClick={() => navigate(`/detail/${p.product_id}`)}
                 >
@@ -40,8 +40,8 @@ function ProductList( {products}) {
                     <div className="min-w-0">
                       <p className="truncate w-[150px]">{p.product_name}</p>
                     </div>
-                    <div className="w-full flex items-end justify-between mt-[5px] px-2">
-                        <div className="flex w-full justify-start items-center gap-1">
+                    <div className="product_price w-full flex items-end justify-between mt-[5px] px-2">
+                        <div className="product_manufacturer_name flex w-full justify-start items-center gap-1">
                             <img className='w-[15px] h-[15px] object-cover rounded-[50%]' src={`http://localhost/computer-store/backend/uploads/manufacturers_img/${p.manufacturer_logo_image}`} alt={p.manufacturer_name} />
                             <span className='text-[10px] text-gray-500 bg-[#e7f3ff] rounded-[3px] px-1'>{p.manufacturer_name}</span>
                         </div>
@@ -51,7 +51,7 @@ function ProductList( {products}) {
                             <span className="line-through text-gray-400 text-[12px]">
                                 {formatter.format(price)}
                             </span>
-                            <span className='text-[15px]'>{formatter.format(discounted)}</span>
+                            <span className='text-[15px] font-bold'>{formatter.format(discounted)}</span>
                           </div>
                         </>
                       ) : (

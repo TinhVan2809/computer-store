@@ -3,3 +3,66 @@
 .sale-none {
    display: none;
 }
+
+@media (max-width:768px) {
+   .product-container {
+      padding: 0;
+   }
+
+   .product-container .products {
+     display: flex;
+     flex-wrap: wrap;
+   }
+
+    .product-container .products .card{
+      width: 180px;
+   }
+
+   .product-container .products .card .product_price {
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+   }
+
+   .product-container .products .card .product_price .product_manufacturer_name{
+      justify-content: center;
+      margin-bottom: 2px;
+   }
+}
+
+@media (width < 600px){
+   .product-container .products .card{
+      width: 180px;
+   }
+
+   .product-container .products .card .product_price {
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+   }
+
+   .product-container .products .card .product_price .product_manufacturer_name{
+      justify-content: center;
+      margin-bottom: 2px;
+   }
+}
+
+@media (max-width:1024px) {
+   .product-container .products .card{
+      width: 190px;
+   }
+
+    .product-container .products .card .product_price {
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+   }
+
+   .product-container .products .card .product_price .product_manufacturer_name{
+      justify-content: center;
+      margin-bottom: 2px;
+   }
+}

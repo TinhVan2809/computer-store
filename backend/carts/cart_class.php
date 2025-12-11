@@ -49,6 +49,27 @@
             }
         }
 
+
+        public function deleteCartById($cart_id) {
+        if (empty($cart_id)) {
+            return false;
+        }
+
+        try {
+            $db = Database::getInstance();
+            $connection = $db->getConnection();
+            $sql = "DELETE FROM carts WHERE cart_id = :cart_id";
+            $delete = $connection->prepare($sql);
+            $delete->bindValue('cart_id',  $cart_id, PDO::PARAM_INT);
+
+            return $delete->execute();
+           
+        } catch (PDOException $e) {
+            error_log("Error Deleting " . $e->getMessage());
+            return false;
+        }
+        }
+
      
     }
 

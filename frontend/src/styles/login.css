@@ -34,3 +34,11 @@ input[type="checkbox"] {
     color: #272727;
     border-color: #000;
 }
+
+@media (max-width: 768px) {
+  form {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+}

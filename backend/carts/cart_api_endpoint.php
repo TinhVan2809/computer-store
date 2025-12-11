@@ -97,7 +97,7 @@ header('Content-Type: application/json');
 
 
    } catch(PDOException $e) {
-        error_log('General Error in manufacturer_api_endpoint.php: ' . $e->getMessage());
+        error_log('General Error in Cart_api_endpoint.php: ' . $e->getMessage());
         http_response_code(500);
         echo json_encode(['success' => false, 'message' => 'An unexpected error occurred']);
    }
