@@ -33,7 +33,7 @@
 
 @media (width < 600px){
    .product-container .products .card{
-      width: 180px;
+      width: 180px !important;
    }
 
    .product-container .products .card .product_price {

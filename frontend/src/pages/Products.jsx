@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
 import ProductList from '../components/products/ProductList';
 
+import UserContext from "../context/UserContext";
+import { useContext } from "react";
 
 function Products() {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(false);
+
 
     // pagination state
     const [currentPage, setCurrentPage] = useState(1);
@@ -88,8 +91,8 @@ function Products() {
                 }
 
                 <button onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages}>Next</button>
-            </div>
-           
+             </div>
+
         </>
     );
 }
