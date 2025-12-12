@@ -12,23 +12,32 @@ const app = express();
 app.use(express.json());
 
 
-app.use(cors({
-  origin: 'http://localhost:5173', // Adjust this to your frontend's origin
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: ["http://localhost:5173", 
+            "http://localhost:3000",
+            "http://localhost:5173",
+            "http://127.0.0.1:3000",
+            "http://127.0.0.1:5173",
+            "http://localhost:5174",
+            "http://localhost:5175",],
+    // Adjust this to your frontend's origin
+    credentials: true,
+  })
+);
 app.use(cookieParser());
 
 
 
 // REGISTER
 app.post("/register", (req, res) => {
-    const {username, email, password, avata, phone, address, gender} = req.body;
+    const {username, email, password, phone, address, gender, birthday} = req.body;
 
     const hashedPassword = bcrypt.hashSync(password, 10);
 
     db.query(
-        "INSERT INTO users (username, email, password, phone, address, gender) VALUES (?, ?, ?, ?, ?, ?) ",
-        [username, email, hashedPassword, avata, phone, address, gender],
+        "INSERT INTO users (username, email, password, phone, address, gender, birthday) VALUES (?, ?, ?, ?, ?, ?, ?) ",
+        [username, email, hashedPassword, phone, address, gender, birthday],
         (err, result) => {
             if(err) return res.status(400).json({error: err});
             res.json({message: "User registered successfully!"});

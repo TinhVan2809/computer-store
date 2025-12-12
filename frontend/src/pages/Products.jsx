@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import ProductList from '../components/products/ProductList';
 
-import UserContext from "../context/UserContext";
-import { useContext } from "react";
 
 function Products() {
     const [products, setProducts] = useState([]);

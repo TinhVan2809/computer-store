@@ -21,7 +21,7 @@
             }
         }
 
-        public function getCartByUser($user_id, int $limit = 1, int $offset = 0 ) {
+        public function getCartByUser($user_id, int $limit = 10, int $offset = 0 ) {
             if(empty($user_id)) {
                 return false;
             }
@@ -29,7 +29,7 @@
             try{
                 $db = Database::getInstance();
                 $connection = $db->getConnection();
-                $sql = "SELECT c.cart_id, c.product_id, c.user_id, c.add_at, p.product_name, p.image_main, p.product_price
+                $sql = "SELECT c.cart_id, c.product_id, c.user_id, c.add_at, p.product_name, p.image_main, p.product_quantity, p.product_price, p.product_sale
                     FROM carts c
                     LEFT JOIN products p ON c.product_id = p.product_id
                     WHERE c.user_id = :user_id

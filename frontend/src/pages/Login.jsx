@@ -57,7 +57,7 @@ function Login() {
                             <div className="relative w-full bg-white flex justify-start items-center px-3 gap-2 rounded-[20px] shadow-xl">
                                 <i className="ri-lock-fill text-stone-700"></i>
                                 <input className='w-full py-2.5 outline-0' type={passwordVisible ? "text" : "password"} placeholder='Password' id='password' name='password' value={password} onChange={(e) => setPassword(e.target.value)} required/>
-                                <i className={passwordVisible ? "cursoer-pointer ri-eye-fill" : "cursor-pointer ri-eye-off-fill"} id='showPassword' onClick={togglePasswordVisibility}></i>
+                                <i className={passwordVisible ? "cursor-pointer ri-eye-fill" : "cursor-pointer ri-eye-off-fill"} id='showPassword' onClick={togglePasswordVisibility}></i>
                             </div>
                         </div>
                         <div className="flex w-[400px] justify-between mt-2">
@@ -79,7 +79,7 @@ function Login() {
                                 <p className='text-stone-700 text-[14px]'>Join our community today to unlock exclusive features, resources, and premium support. It only takes a minute!</p>
                             </div>
                             <div className="flex gap-3">
-                                <button className='btn-visit px-8 py-1 bg-black rounded-2xl text-white cursor-pointer'>Sign Up</button>
+                                <button className='btn-visit px-8 py-1 bg-black rounded-2xl text-white cursor-pointer' onClick={() => navigate('/register')}>Sign Up</button>
                                 <button className='px-6 py-1 border border-gray-300 rounded-2xl cursor-pointer'>Learn More</button>
                             </div>
                         </div>

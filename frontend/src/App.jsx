@@ -13,7 +13,7 @@ import Login from './pages/Login';
 import Carts from './pages/Carts';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
-import { useEffect, useState } from 'react';
+
 
 //STYLES
 import './styles/navbar.css';

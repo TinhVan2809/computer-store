@@ -48,18 +48,22 @@ function Navbar() {
             {/* User Info */}
             {currentUser ? (
               <>
-                <div className="flex justify-between items-center gap-6 cursor-pointe p-1 px-2 bg-gray-100 rounded-[20px] transition duration-500 shrink-0">
+                <div className="flex justify-between items-center gap-6 cursor-pointe p-1.5 px-2.5 bg-gray-100 rounded-3xl transition duration-500 shrink-0">
                   <i
-                    className="ri-user-line text-[20px] cursor-pointer transition duration-200 bg-white px-1.5 rounded-[50%]"
+                    className="ri-user-line text-[24px] cursor-pointer transition duration-200 bg-white px-1.5 rounded-[50%]"
                     onClick={() => navigate("/profile")}
                   ></i>
 
-                  <i className="fa-regular fa-bell text-[20px] cursor-pointer transition duration-200"></i>
+                  <i className="fa-regular fa-bell text-[24px] cursor-pointer transition duration-200"></i>
 
-                  <i
-                    className="ri-shopping-cart-2-line text-[20px] cursor-pointer transition duration-200"
+                  <div className="relative">
+                    <i
+                    className="ri-shopping-cart-2-line text-[24px] cursor-pointer transition duration-200 "
                     onClick={() => navigate(`/cart/${currentUser.id}`)}
                   ></i>
+                  <p className="bg-red-600 text-[10px] text-white px-1 rounded-2xl absolute top-0 left-3">1</p>
+                  </div>
+
                 </div>
               </>
             ) : (
