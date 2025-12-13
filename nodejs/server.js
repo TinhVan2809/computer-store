@@ -31,6 +31,7 @@ app.use(cookieParser());
 
 // REGISTER
 app.post("/register", (req, res) => {
+
     const {username, email, password, phone, address, gender, birthday} = req.body;
 
     const hashedPassword = bcrypt.hashSync(password, 10);
@@ -51,7 +52,7 @@ app.post("/login", (req, res) => {
     const {email, password} = req.body;
 
     db.query(
-        "SELECT * FROM users WHERE email = ?",
+        "SELECT u.*, COUNT(c.product_id) AS total_product FROM users u LEFT JOIN carts c ON c.user_id = u.user_id WHERE u.email = ? GROUP BY u.user_id",
         [email],
         (err, users) => {
             if(err) return res.status(500).json({error: err});
@@ -63,8 +64,8 @@ app.post("/login", (req, res) => {
             // check password
             const isMatch = bcrypt.compareSync(password, user.password);
             if(!isMatch) return res.status(400).json({ message: "Invalid password"});
-            
-            //creatd token
+                        
+            //created token
             const token = jwt.sign(
                 {
                     id: user.user_id, 
@@ -73,7 +74,9 @@ app.post("/login", (req, res) => {
                     avata: user.avata,
                     phone: user.phone,
                     role: user.role,
-                    address: user.address
+                    address: user.address,
+                    birthday: user.birthday,
+                    total_product: user.total_product
                 },
                 process.env.JWT_SECRET,
                 {
@@ -111,15 +114,15 @@ function auth(req, res, next) {
 app.get("/userData", auth, (req, res) => {
     res.json({
         message: "Access granted",
-        user: req.user
+        user: req.user,
+        product: req.product,
+        env: req.env,
     });
 });
 
 app.post("/logout", (req, res) => {
     res.clearCookie("token").json({ message: "Logout successful" });
 });
-
-
 
 
 app.listen(process.env.PORT, () =>

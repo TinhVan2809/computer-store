@@ -1,1 +1,6 @@
 @import 'tailwindcss';
+
+
+form input[type="password"] {
+    padding-right: 30px;
+}

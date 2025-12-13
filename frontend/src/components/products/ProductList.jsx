@@ -61,7 +61,7 @@ function ProductList( {products}) {
                     </div>
                     
                     <div className="flex w-full h-[30px] mt-3 justify-center items-center">
-                        <button className='bg-gray-200 w-full h-full flex justify-center items-center text-center cursor-pointer transition duration-500 hover:bg-black hover:text-white' href=""><i class="fa-solid fa-cart-plus"></i></button>
+                        <button className='bg-gray-200 w-full h-full flex justify-center items-center text-center cursor-pointer transition duration-500 hover:bg-black hover:text-white' href="#"><i className="fa-solid fa-cart-plus"></i></button>
                        
                     </div>
                   </div>

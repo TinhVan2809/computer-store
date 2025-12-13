@@ -4,7 +4,7 @@ import API from "../api/api";
 import "../styles/register.css";
 
 function Register() {
-  const inputStyle = "bg-white shadow-2xl outline-none px-4 p-2 rounded-3xl";
+  const inputStyle = "bg-white w-full shadow-2xl outline-none px-4 p-2 rounded-3xl";
   const navigate = useNavigate();
 
   const [username, setUsername] = useState("");
@@ -14,6 +14,12 @@ function Register() {
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [gender, setGender] = useState("");
+
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  
+  const handlePasswordVisible = () => {
+    setPasswordVisible(!passwordVisible);
+  }
 
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -40,7 +46,7 @@ function Register() {
     } catch (err) {
       setLoading(false);
       if (err.response?.data?.error?.code === "ER_DUP_ENTRY") {
-        setMessage("Username existed!");
+        setMessage("Username or Email existed!");
       } else {
         setMessage("Register Error!");
       }
@@ -100,15 +106,18 @@ function Register() {
               <label htmlFor="password">
                 password <i class="ri-lock-fill"></i>
               </label>
-              <input
+              <div className="relative">
+                <input
                 className={inputStyle}
-                type="password"
+                type={passwordVisible ? "text" : "password"}
                 placeholder="Password"
                 name="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
+              <i className={passwordVisible ? "ri-eye-fill absolute bottom-2 right-3 cursor-pointer" : "ri-eye-off-fill absolute bottom-2 right-3 cursor-pointer"} onClick={handlePasswordVisible}></i>
+              </div>
             </div>
           </div>
 
@@ -167,13 +176,13 @@ function Register() {
                 className="bg-white rounded-2xl py-2"
               >
                 <option value="male">
-                  Male <i class="ri-men-fill"></i>
+                  Male 
                 </option>
                 <option value="female">
-                  female <i class="ri-women-fill"></i>
+                  female 
                 </option>
                 <option value="noreveal">
-                  Don't want to reveal <i class="ri-travesti-fill"></i>
+                  Don't want to reveal 
                 </option>
               </select>
             </div>
