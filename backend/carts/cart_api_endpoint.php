@@ -1,11 +1,12 @@
 <?php
 
-    require_once './cart_class.php';
+require_once './cart_class.php';
 
 /**
  * Handle CORS (Cross-Origin Resource Sharing)
  */
-function handleCORS() {
+function handleCORS()
+{
     $allowedOrigins = [
         'http://localhost:3000',
         'http://localhost:5173',
@@ -34,7 +35,8 @@ function handleCORS() {
 
 handleCORS();
 
-function sendJson($payload, int $status = 200) {
+function sendJson($payload, int $status = 200)
+{
     http_response_code($status);
     echo json_encode($payload, JSON_UNESCAPED_UNICODE);
     exit;
@@ -43,7 +45,7 @@ function sendJson($payload, int $status = 200) {
 header('Content-Type: application/json');
 
 
-   try{
+try {
     $action = $_REQUEST['action'] ?? null;
     $action = is_string($action) ? trim(filter_var($action, FILTER_SANITIZE_FULL_SPECIAL_CHARS)) : null;
 
@@ -89,17 +91,96 @@ header('Content-Type: application/json');
             ]);
             break;
 
+        case 'add':
+            
+                // Ensure it's a POST request for adding
+                if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                    sendJson(['success' => false, 'message' => 'Invalid request method. Only POST is allowed for adding to cart.'], 405);
+                }
 
-         default:
+                // Read JSON input from request body
+                $input = json_decode(file_get_contents('php://input'), true);
+                $user_id = $input['user_id'] ?? null;
+                $product_id = $input['product_id'] ?? null;
+
+                // Validate inputs
+                if (!$user_id || !$product_id) {
+                    sendJson(['success' => false, 'message' => 'User ID and Product ID are required.'], 400);
+                }
+
+                $user_id = filter_var($user_id, FILTER_VALIDATE_INT);
+                $product_id = filter_var($product_id, FILTER_VALIDATE_INT);
+
+                if ($user_id === false || $product_id === false) {
+                    sendJson(['success' => false, 'message' => 'Invalid User ID or Product ID.'], 400);
+                }
+
+                if ($cartsObj->addToCart($user_id, $product_id)) {
+                    sendJson(['success' => true, 'message' => 'Product added to cart successfully.']);
+                } else {
+                    sendJson(['success' => false, 'message' => 'Failed to add product to cart.'], 500);
+                } 
+           
+            break;
+
+        case 'update_quantity':
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                sendJson(['success' => false, 'message' => 'Invalid request method.'], 405);
+            }
+
+            $input = json_decode(file_get_contents('php://input'), true);
+            $cart_id = $input['cart_id'] ?? null;
+            $quantity = $input['quantity'] ?? null;
+
+            if ($cart_id === null || $quantity === null) {
+                sendJson(['success' => false, 'message' => 'Cart ID and quantity are required.'], 400);
+            }
+
+            $cart_id = filter_var($cart_id, FILTER_VALIDATE_INT);
+            $quantity = filter_var($quantity, FILTER_VALIDATE_INT);
+
+            if ($cart_id === false || $quantity === false) {
+                sendJson(['success' => false, 'message' => 'Invalid Cart ID or quantity.'], 400);
+            }
+
+            if ($cartsObj->updateCartQuantity($cart_id, $quantity)) {
+                sendJson(['success' => true, 'message' => 'Cart quantity updated successfully.']);
+            } else {
+                sendJson(['success' => false, 'message' => 'Failed to update cart quantity.'], 500);
+            }
+            break;
+
+        case 'delete':
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                sendJson(['success' => false, 'message' => 'Invalid request method.'], 405);
+            }
+
+            $input = json_decode(file_get_contents('php://input'), true);
+            $cart_id = $input['cart_id'] ?? null;
+
+            if (!$cart_id) {
+                sendJson(['success' => false, 'message' => 'Cart ID is required.'], 400);
+            }
+
+            $cart_id = filter_var($cart_id, FILTER_VALIDATE_INT);
+            if ($cart_id === false) {
+                sendJson(['success' => false, 'message' => 'Invalid Cart ID.'], 400);
+            }
+
+            if ($cartsObj->deleteCartById($cart_id)) {
+                sendJson(['success' => true, 'message' => 'Item removed from cart successfully.']);
+            } else {
+                sendJson(['success' => false, 'message' => 'Failed to remove item from cart.'], 500);
+            }
+            break;
+
+        default:
             http_response_code(400);
             echo json_encode(['success' => false, 'message' => 'Invalid action']);
             break;
     }
-
-
-   } catch(PDOException $e) {
-        error_log('General Error in Cart_api_endpoint.php: ' . $e->getMessage());
-        http_response_code(500);
-        echo json_encode(['success' => false, 'message' => 'An unexpected error occurred']);
-   }
-?>
+} catch (PDOException $e) {
+    error_log('General Error in Cart_api_endpoint.php: ' . $e->getMessage());
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => 'An unexpected error occurred']);
+}
