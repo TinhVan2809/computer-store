@@ -7,7 +7,7 @@ function ProductList( {products}) {
 
     return (
       <>
-        <div className="product-container w-full p-5">
+        <div id="product_list" className="product-container w-full p-5">
           <div className="products w-full flex flex-wrap justify-start items-centers gap-10">
             {products.map((p) => {
               const price = Number(p.product_price) || 0;

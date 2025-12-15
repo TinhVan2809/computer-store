@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import ProductList from '../components/products/ProductList';
+import Error from "../components/status/ProductError";
+import Loading from "../components/status/ProductLoading";
 
 
 function Products() {
@@ -43,11 +45,19 @@ function Products() {
    }, []);
 
    if(loading) {
-    return <div>loading...</div>
+    return (
+      <>
+        <Loading />
+      </>
+    )
    }
 
    if(error) {
-    return <div>something went wrong: {error}</div>
+    return (
+      <>
+        <Error error= {error}/>
+      </>
+    )
    }
 
   // pagination calculations

@@ -1,2 +1,48 @@
 @import 'tailwindcss';
 
+@media (max-width: 900px ) {
+    #navbar_cart{
+        padding: 20px 30px;
+        justify-content: space-between;
+        align-items: center;
+    }
+    #navbar_cart span {
+        font-size: 14px;
+    }
+
+    #navbar_link{
+        gap: 0;
+    }
+    #navbar_link #links {
+        margin: 0;
+        margin-right: 10px;
+    }
+    #navbar_link #links ul {
+        gap: 0;
+        justify-content: center;
+    }
+    #navbar_link #links ul li {
+        padding: 10px;
+    }
+
+    #controller {
+        flex-direction: column;
+        justify-content: center;
+        align-items: end;
+        padding: 20px 30px;
+    }
+
+    #controller #sum {
+        flex-direction: column;
+        gap: 5px;
+        justify-content: center;
+        align-items: flex-end;
+    }
+}
+
+
+@media (max-width: 400px) {
+     #navbar_link #links ul li{  
+        display: none;
+     }
+}

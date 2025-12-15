@@ -11,31 +11,45 @@ import Delivering from "../components/orders/Delivering";
 
 function Profile() {
     const BASE_PRO = "http://localhost/computer-store/backend/cart_api_endpoint.php";
-    const { currentUser, logout } = useContext(UserContext);  //eslint-disable-line
-    const [confirm, setConfirm] = useState(false); //eslint-disable-line
+    const { currentUser, logout } = useContext(UserContext); 
+    const [confirm, setConfirm] = useState(false);
+    const [isClosing, setIsClosing] = useState(false);
 
     const [products, setProducts] = useState([]); //eslint-disable-line
     const [error, setError] = useState(''); //eslint-disable-line
     const [loading, setLoading] = useState(false); //eslint-disable-line
 
     const showConfirmLogout = () => {
+        setIsClosing(false);
         setConfirm(true);
     }
     const closeConrimLogout = () => {
-        setConfirm(false);
+        setIsClosing(true);
+        setTimeout(() => {
+            setConfirm(false);
+        }, 300); // Phải khớp với thời gian của animation
     }
 
     if (!currentUser) {
         return <div>Loading profile...</div>;
     }
+
+    // const fetchProductOdersByUser = async() => {
+
+    // }
+
+    // useEffect(() => {
+    //     fetchProductOdersByUser();
+    // }, []);
+
    
     return (
         <>
         {confirm && (
             <>
-              <div className="w-full h-full flex justify-center ">
-                  <div className="popup fixed flex flex-col justify-between items-center z-10000 bg-white px-4 py-7 w-[350px] h-[300px] rounded-xl gap-2">
-                    <h2 className="text-xl">Confirm logout?</h2>
+              <div className="fixed inset-0 bg-opacity-50 flex justify-center items-center z-50">
+                  <div className={`popup flex flex-col justify-between items-center bg-white px-4 py-7 w-[350px] h-[300px] rounded-xl gap-2 ${isClosing ? 'animate-scale-out' : 'animate-scale-in'}`}>
+                    <h2 className="text-xl">Confirm Logout?</h2>
                     <div className="w-full flex justify-center">
                         <i class="fa-solid fa-arrow-right-from-bracket text-8xl"></i>
                     </div>
@@ -87,11 +101,11 @@ function Profile() {
                 <div className="flex w-full p-3">
                         <div className="flex w-full flex-col gap-4">
                             <ul className="w-full flex gap-20">
-                                <li><NavLink to='waiting'>Waiting</NavLink></li>
-                                <li><NavLink to='delivering'>Delivering</NavLink></li>
-                                <li><NavLink to='received'>Received</NavLink></li>
-                                <li><NavLink to='abort'>Abort</NavLink></li>
-                                <li><NavLink to='refund'>Refund</NavLink></li>
+                                <li><NavLink to='/profile/waiting'>Waiting</NavLink></li>
+                                <li><NavLink to='/profile/delivering'>Delivering</NavLink></li>
+                                <li><NavLink to='/profile/received'>Received</NavLink></li>
+                                <li><NavLink to='/profile/abort'>Abort</NavLink></li>
+                                <li><NavLink to='/profile/refund'>Refund</NavLink></li>
                             </ul>
                             <div className="w-full relative z-30">
                                         <Routes>

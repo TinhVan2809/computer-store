@@ -1,7 +1,7 @@
 function Delivering() {
     return (
         <>
-        <p>hello world</p>
+            
         </>
     );
 }

@@ -2,6 +2,9 @@
 import { useContext, useEffect, useState } from "react";
 import UserContext from '../context/UserContext';
 import '../styles/carts.css';
+import NavbarCart from "../components/carts/Navbar_cart";
+import SumController from "../components/carts/SumController";
+
 
 function Carts() {
     const API_CART = "http://localhost/computer-store/backend/carts/cart_api_endpoint.php";
@@ -66,29 +69,16 @@ function Carts() {
     
     return (
         <>
+        <NavbarCart />
               {cart.length > 0 ? (
-                        <div>
-                            <ul>
-                                {cart.map((item) => (
-                                    <li key={item.cart_id}>
-                                        <p>Product: {item.product_name}</p>
-                                        <p>Quantity: {item.product_quantity}</p>
-                                        <p>Price: ${item.product_price}</p>
-                                        <p>Sale: {item.product_sale}</p>
-                                    </li>
-                                ))}
-                            </ul>
-                            <div className="pagination">
-                                <p>Page {currentPage + 1}</p>
-                                <p>Total items: {totalCount}</p>
-                                {/* Add buttons for pagination later */}
-                            </div>
-                        </div>
+                      <>
+
+                      </>
                     ) : (
                         <p>Your cart is empty.</p>
                     )}
                
-            
+            <SumController />
         </>
     );
 }

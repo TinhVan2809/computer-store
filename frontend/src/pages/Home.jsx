@@ -8,7 +8,7 @@ function Home() {
 
             <Banners />
 
-            <div className="w-full py-2 px-10">
+            <div id="home" className="w-full py-2 px-10">
                 <Products />
             </div>
             

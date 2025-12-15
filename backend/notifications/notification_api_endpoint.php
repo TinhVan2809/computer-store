@@ -1,16 +1,20 @@
 <?php
 
-    require_once './cart_class.php';
+    require_once './notification_class.php';
 
+    
 /**
  * Handle CORS (Cross-Origin Resource Sharing)
+ * Allows requests from specified origins and methods
  */
 function handleCORS() {
+    // Define allowed origins
     $allowedOrigins = [
         'http://localhost:3000',
         'http://localhost:5173',
         'http://127.0.0.1:3000',
         'http://127.0.0.1:5173',
+        'http://localhost:80',
         'http://localhost:5174',
         'http://localhost:5175',
     ];
@@ -22,8 +26,8 @@ function handleCORS() {
     }
 
     header('Access-Control-Allow-Credentials: true');
-    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-    header('Access-Control-Allow-Headers: Content-Type, Authorization');
+    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS, PATCH');
+    header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
     header('Access-Control-Max-Age: 86400');
 
     if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -33,6 +37,8 @@ function handleCORS() {
 }
 
 handleCORS();
+header('Content-Type: application/json');
+
 
 function sendJson($payload, int $status = 200) {
     http_response_code($status);
@@ -40,27 +46,23 @@ function sendJson($payload, int $status = 200) {
     exit;
 }
 
-header('Content-Type: application/json');
+    try{
 
-
-   try{
-    $action = $_REQUEST['action'] ?? null;
-    $action = is_string($action) ? trim(filter_var($action, FILTER_SANITIZE_FULL_SPECIAL_CHARS)) : null;
+        $action = $_REQUEST['action'] ?? null;
+        $action = is_string($action) ? trim(filter_var($action, FILTER_SANITIZE_FULL_SPECIAL_CHARS)) : null;
 
     if (!$action) {
-        http_response_code(400);
-        echo json_encode(['success' => false, 'message' => 'No action specified']);
-        exit();
+        sendJson(['success' => false, 'message' => 'No action specified'], 400);
     }
 
-    $cartsObj = new cart_class();
+    $notification = new Notification_class();
 
-    switch ($action) {
-        // Get cart by user
-        case 'get':
+    switch($action) {
+        case 'get': 
+            
             $page = filter_input(INPUT_GET, 'page', FILTER_VALIDATE_INT, ['options' => ['default' => 1, 'min_range' => 1]]) ?: 1;
             $limit = filter_input(INPUT_GET, 'limit', FILTER_VALIDATE_INT, ['options' => ['default' => 50, 'min_range' => 1]]) ?: 50;
-            // Determine user_id: prefer GET/POST parameter, fallback to session if available
+            
             $user_id = null;
             if (isset($_GET['user_id'])) {
                 $user_id = filter_input(INPUT_GET, 'user_id', FILTER_VALIDATE_INT);
@@ -75,9 +77,9 @@ header('Content-Type: application/json');
             }
 
             $offset = ($page - 1) * $limit;
-            $totalItems = $cartsObj->getCountCart($user_id);
+            $totalItems = $notification->getCountNotificationsByUser($user_id);
             $totalPages = ceil($totalItems / $limit);
-            $data = $cartsObj->getCartByUser($user_id, $limit, $offset);
+            $data = $notification->getAllNotificationsByUser($user_id, $limit, $offset);
 
             sendJson([
                 'success' => true,
@@ -89,17 +91,16 @@ header('Content-Type: application/json');
             ]);
             break;
 
-
-         default:
-            http_response_code(400);
-            echo json_encode(['success' => false, 'message' => 'Invalid action']);
+            default:
+            sendJson(['success' => false, 'message' => 'Invalid action: ' . htmlspecialchars($action)], 400);
             break;
     }
 
 
-   } catch(PDOException $e) {
-        error_log('General Error in Cart_api_endpoint.php: ' . $e->getMessage());
+    } catch (PDOException $e) {
+        error_log('General Error in notification_api_endpoint.php: ' . $e->getMessage());
         http_response_code(500);
         echo json_encode(['success' => false, 'message' => 'An unexpected error occurred']);
-   }
+    } 
+
 ?>

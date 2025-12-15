@@ -5,9 +5,7 @@ function Waiting() {
 
     return (
         <>
-            <div className="w-full bg-amber-200">
-                <p>heelo world</p>
-            </div>
+           
         </>
     );
 }
