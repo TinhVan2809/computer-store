@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState } from "react";
 import { NavLink, Route, Routes} from "react-router-dom";
 import UserContext from "../context/UserContext";
 import '../styles/profile.css';
@@ -33,14 +33,6 @@ function Profile() {
     if (!currentUser) {
         return <div>Loading profile...</div>;
     }
-
-    // const fetchProductOdersByUser = async() => {
-
-    // }
-
-    // useEffect(() => {
-    //     fetchProductOdersByUser();
-    // }, []);
 
    
     return (

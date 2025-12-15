@@ -1,9 +1,49 @@
-import {useNavigate} from 'react-router-dom';
+import { useContext, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import UserContext from '../../context/UserContext';
 import '../../styles/Products.css'
 
-function ProductList( {products}) {
+function ProductList({ products }) {
 
+    const API_URL = 'http://localhost/computer-store/backend/carts/cart_api_endpoint.php';
     const navigate = useNavigate();
+    const { currentUser, refreshCartCount } = useContext(UserContext);
+
+    const [toastSuccessAddToCart, setToastSuccessAddToCart] = useState(false);
+
+    const HandleToggleCart = async (e, product_id) => {
+        e.stopPropagation();
+
+        if (!currentUser) {
+            navigate('/login');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_URL}?action=add`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: currentUser.id,
+                    product_id: product_id,
+                }),
+            });
+
+            const result = await response.json();
+            setToastSuccessAddToCart(true);
+            setTimeout(() => {
+              setToastSuccessAddToCart(false);
+            }, 2000);
+            if (result.success) {
+                refreshCartCount(); // Cập nhật số lượng trên Navbar
+            }
+        } catch (error) {
+            console.error('Failed to add product to cart:', error);
+            alert('Đã có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng.');
+        }
+    };
 
     return (
       <>
@@ -61,8 +101,7 @@ function ProductList( {products}) {
                     </div>
                     
                     <div className="flex w-full h-[30px] mt-3 justify-center items-center">
-                        <button className='bg-gray-200 w-full h-full flex justify-center items-center text-center cursor-pointer transition duration-500 hover:bg-black hover:text-white' href="#"><i className="fa-solid fa-cart-plus"></i></button>
-                       
+                        <button onClick={(e) => HandleToggleCart(e, p.product_id)} className='bg-gray-200 w-full h-full flex justify-center items-center text-center cursor-pointer transition duration-500 hover:bg-black hover:text-white' href="#"><i className="fa-solid fa-cart-plus"></i></button>
                     </div>
                   </div>
                 </div>
@@ -70,6 +109,15 @@ function ProductList( {products}) {
             })}
           </div>
         </div>
+
+        {/* TOAST THÔNG BÁO ĐÃ THÊM SẢN PHẨM VÀO GIỎ HÀNG */}
+        {toastSuccessAddToCart && (
+          <div className="fixed z-100 flex justify-center items-center w-65 h-30 rounded-xl bg-gray-300 top-[40%] right-[43%]">
+            <div className="">
+              <i className="ri-check-line text-white text-[60px] p-3 rounded-[50%] bg-stone-700"></i>
+            </div>
+          </div>
+        )}
       </>
     );
 }

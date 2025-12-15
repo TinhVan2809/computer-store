@@ -14,6 +14,7 @@ import Carts from './pages/Carts';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
 import Notifications from './pages/Notifications';
+import Payments from './components/Payments/Payments';
 
 
 //STYLES
@@ -35,6 +36,7 @@ function App() {
         <Route path='/cart/:user_id' element={<Carts />}></Route>
         <Route path='/profile/*' element={<Profile />} />
         <Route path='/notifications/:user_id' element={<Notifications />}/>
+        <Route path="/payments" element={<Payments />} />
       </Routes>
 
   </>
