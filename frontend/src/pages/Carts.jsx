@@ -16,6 +16,8 @@ function Carts() {
     const navigate = useNavigate();
     const [selectedItems, setSelectedItems] = useState([]);
     const [showNoItemsToast, setShowNoItemsToast] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState(null);
+    const [confirmDeleteItem, setConfirmDeleteitem] = useState(false);
     const [pagination, setPagination] = useState({
         total_items: 0,
         total_pages: 1,
@@ -90,12 +92,19 @@ function Carts() {
         }
     };
 
-    const handleDeleteItem = async (cart_id) => {
-        if (!window.confirm('Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng không?')) {
-            return;
-        }
+    const onDeleteItem = (cart_id, product_name) => {
+        setItemToDelete({ id: cart_id, name: product_name });
+        setConfirmDeleteitem(true);
+    }
+    const cancelDeleteItem = () => {
+        setItemToDelete(null);
+        setConfirmDeleteitem(false);
+    }
 
+    const handleDeleteItem = async () => {
         // Cập nhật giao diện trước (Optimistic Update)
+        if (!itemToDelete) return;
+        const cart_id = itemToDelete.id;
         const originalCart = [...cart];
         const newCart = cart.filter(item => item.cart_id !== cart_id);
         setCart(newCart);
@@ -114,6 +123,8 @@ function Carts() {
                 setCart(originalCart); // Hoàn tác lại nếu có lỗi
             } else {
                 refreshCartCount(); // Cập nhật lại tổng số lượng
+                // Đóng modal sau khi xóa thành công
+                cancelDeleteItem();
             }
         } catch (err) {
             setError(err.message)
@@ -195,59 +206,121 @@ function Carts() {
     }
     
     return (
-        <>
-            <NavbarCart />
+      <>
+        <NavbarCart />
 
-             <div className="cart-items">
-                          {cart.map(item => (
-                              <div key={item.cart_id} className={`cart-item ${selectedItems.includes(item.cart_id) ? 'selected' : ''}`}>
-                                  <input 
-                                    type="checkbox" 
-                                    className="item-checkbox"
-                                    checked={selectedItems.includes(item.cart_id)}
-                                    onChange={() => handleSelectItem(item.cart_id)}
-                                  />
-                                  <img src={`http://localhost/computer-store/backend/uploads/products_img/${item.image_main}`} alt={item.product_name} className="item-image w-50" />
-                                  <div className="item-details">
-                                      <p>{item.product_name}</p>
-                                      <p>$ {item.product_price}</p>
-                                      {/* Thêm các chi tiết khác nếu cần */}
-                                  </div>
-                                  <div className="quantity-control">
-                                      <button onClick={() => handleQuantityChange(item.cart_id, parseInt(item.quantity) - 1)}>-</button>
-                                      <input 
-                                          type="number" 
-                                          value={item.quantity} 
-                                          onChange={(e) => handleQuantityChange(item.cart_id, parseInt(e.target.value) || 1)}
-                                          min="1"
-                                      />
-                                      <button onClick={() => handleQuantityChange(item.cart_id, parseInt(item.quantity) + 1)}>+</button>
-                                  </div>
-                                  <div className="item-actions">
-                                    <button className="delete-btn" onClick={() => handleDeleteItem(item.cart_id)}>Xóa</button>
-                                  </div>
-                              </div>
-                          ))}
-                      </div>
+        {cart.length > 0 ? <div className="cart-items">
+          {cart.map((item) => (
+            <div
+              key={item.cart_id}
+              className={`cart-item ${
+                selectedItems.includes(item.cart_id) ? "selected" : ""
+              }`}
+            >
+              <input
+                type="checkbox"
+                className="item-checkbox"
+                checked={selectedItems.includes(item.cart_id)}
+                onChange={() => handleSelectItem(item.cart_id)}
+              />
+              <img
+                src={`http://localhost/computer-store/backend/uploads/products_img/${item.image_main}`}
+                alt={item.product_name}
+                className="item-image w-50"
+              />
+              <div className="item-details">
+                <p>{item.product_name}</p>
+                <p>$ {item.product_price*(1 - item.product_sale / 100)}</p>
+                {/* Thêm các chi tiết khác nếu cần */}
+              </div>
+              <div className="quantity-control">
+                <button
+                  onClick={() =>
+                    handleQuantityChange(
+                      item.cart_id,
+                      parseInt(item.quantity) - 1
+                    )
+                  }
+                >
+                  -
+                </button>
+                <input
+                  type="number"
+                  value={item.quantity}
+                  onChange={(e) =>
+                    handleQuantityChange(
+                      item.cart_id,
+                      parseInt(e.target.value) || 1
+                    )
+                  }
+                  min="1"
+                />
+                <button
+                  onClick={() =>
+                    handleQuantityChange(
+                      item.cart_id,
+                      parseInt(item.quantity) + 1
+                    )
+                  }
+                >
+                  +
+                </button>
+              </div>
+              <div className="item-actions">
+                <button
+                  className="delete-btn"
+                  onClick={() => onDeleteItem(item.cart_id, item.product_name)}
+                >
+                  Xóa
+                </button>
+              </div>
+            </div>
+          ))}
+        </div> : (
+            <div className="">Ở đây trống trãi quá.</div>
+        )}
 
-            <SumController 
-                totalPrice={totalSelectedPrice} 
-                selectedCount={selectedItems.length}
-                onSelectAll={handleSelectAll}
-                allItemsSelected={allItemsSelected}
-                onCheckout={handleCheckout}
-            />
+        <SumController
+          totalPrice={totalSelectedPrice}
+          selectedCount={selectedItems.length}
+          onSelectAll={handleSelectAll}
+          allItemsSelected={allItemsSelected}
+          onCheckout={handleCheckout}
+        />
 
-              {/* Toast Notification */}
-            {showNoItemsToast && (
-                <div className="fixed top-20 right-5 bg-yellow-500 text-white py-2 px-4 rounded-lg shadow-lg animate-bounce">
-                    <div className="flex items-center gap-2">
-                        <i className="ri-error-warning-line"></i>
-                        <span>Vui lòng chọn sản phẩm!</span>
-                    </div>
+        {/* Toast Notification */}
+        {showNoItemsToast && (
+          <div className="fixed top-20 right-5 bg-yellow-500 text-white py-2 px-4 rounded-lg shadow-lg animate-bounce">
+            <div className="flex items-center gap-2">
+              <i className="ri-error-warning-line"></i>
+              <span>Vui lòng chọn sản phẩm!</span>
+            </div>
+          </div>
+        )}
+
+        {/* Popup show modal comfim delete item */}
+        {confirmDeleteItem && (
+          <>
+            <div id="modal_comfirm_delete" className="fixed inset-0 bg-opacity-50 flex justify-center items-center z-50">
+              <div className="flex flex-col justify-between p-5 w-96 bg-white shadow-2xl rounded-2xl border border-stone-200 gap-4">
+                <div className="flex flex-col gap-2">
+                  <h2 className="text-xl font-bold">Xác nhận xóa</h2>
+                  <p className="text-gray-700">Bạn có chắc chắn muốn xóa sản phẩm <strong className="text-black">{itemToDelete?.name}</strong> khỏi giỏ hàng?</p>
                 </div>
-            )}
-        </>
+                <div className="w-full flex justify-end items-center gap-3">
+                  <button onClick={cancelDeleteItem} className="px-4 py-2 rounded-2xl border border-gray-300 cursor-pointer hover:bg-gray-100">Hủy</button>
+                  <button
+                    onClick={handleDeleteItem}
+                    className="bg-[#e02e2a] text-white px-4 py-2 rounded-2xl cursor-pointer hover:opacity-80"
+                  >
+                    Xóa
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+      </>
     );
 }
 

@@ -73,3 +73,7 @@
     padding: 1rem;
     text-align: right;
 }
+
+#modal_comfirm_delete{
+    background-color: rgba(128, 128, 128, 0.467);
+}
