@@ -8,6 +8,7 @@ function Login() {
    const [email, setEmail] = useState("");
    const [password, setPassword] = useState("");
    const [message, setMessage] = useState("");
+   const [error, setError] = useState(null);
    const [passwordVisible, setPasswordVisible] = useState(false);
     
    const { setCurrentUser } = useContext(UserContext);
@@ -28,6 +29,7 @@ function Login() {
             setMessage("Login successfully!");
             navigate('/'); // Redirect to homepage
         } catch(err) {
+            setError('Something went wrong.', error.message);
             setMessage("Wrong username or password!");
             console.error(err);
         }
@@ -95,11 +97,21 @@ function Login() {
                         </div>
                         <div className="form-bottom flex w-full mt-5 justify-between items-center">
                             <p className='text-[14px] text-gray-600'>Privacy Policy</p>
-                            <p className='text-[14px] text-gray-600'><sup>&copy;</sup>Copyright @Hasekimagru 2025</p>
+                            <p className='text-[14px] text-gray-600'><sup>&copy;</sup>Copyright @Away-store 2025</p>
                         </div>
                     </div>
                     
                 </form> 
+               {error && ( 
+                    <>
+                        <p>{error}</p>
+                    </>
+               )}
+               {message && (
+                <>
+                    <p>{message}</p>
+                </>
+               )}
             </div>
         </>
     );

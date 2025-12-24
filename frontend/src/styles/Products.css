@@ -4,6 +4,10 @@
    display: none;
 }
 
+.add_to_cart {
+   background-color: rgba(0, 0, 0, 0.496);
+}
+
 @media (max-width:768px) {
    .product-container {
       padding: 0;

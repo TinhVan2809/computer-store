@@ -112,7 +112,7 @@ function ProductList({ products }) {
 
         {/* TOAST THÔNG BÁO ĐÃ THÊM SẢN PHẨM VÀO GIỎ HÀNG */}
         {toastSuccessAddToCart && (
-          <div className="fixed z-100 flex justify-center items-center w-65 h-30 rounded-xl bg-gray-300 top-[40%] right-[43%]">
+          <div className="add_to_cart fixed z-100 flex justify-center items-center w-65 h-30 rounded-xl top-[40%] right-[43%]">
             <div className="">
               <i className="ri-check-line text-white text-[60px] p-3 rounded-[50%] bg-stone-700"></i>
             </div>
