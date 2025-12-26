@@ -1,0 +1,8 @@
+langchain
+langchain-openai
+sentence-transformers
+faiss-cpu
+pypdf
+python-dotenv
+tiktoken
+langchain-community

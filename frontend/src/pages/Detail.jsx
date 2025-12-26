@@ -61,6 +61,8 @@ function Detail() {
   if (error) return <div className="error">Something went wrong: {error}</div>;
   if (!product) return <div>No data.</div>;
 
+  
+
   const price = Number(product.product_price) || 0;
   const sale = Number(product.product_sale) || 0;
   const saleClamped = Math.max(0, Math.min(100, sale));
@@ -158,9 +160,18 @@ function Detail() {
               ) : (
                 ""
               )}
+
+          <div className="w-full justify-start flex">
+              <div className="flex justify-center items-center">
+                <button className="border border-gray-300 w-9 py-1 cursor-pointer">-</button>
+                <input className="w-11 text-stone-800 py-1 flex text-center" type="text" role="spinbutton" aria-live="assertive" aria-valuenow="1" value="1" />
+                <button className="border border-gray-300 w-9 py-1 cursor-pointer">+</button>
+              </div>
+          </div>
+
               <div className="flex justify-start items-center bottom-0 py-2 gap-3 w-full">
                 <button className="p-3 border border-gray-300 w-[210px] rounded-[25px] cursor-pointer transition duration-500">
-                  <i class="fa-solid fa-cart-plus"></i>Add To Cart
+                  <i className="fa-solid fa-cart-plus"></i>Add To Cart
                 </button>
                 <button className="p-3 border bg-stone-950 text-white w-[210px] rounded-[25px] cursor-pointer transition duration-300 hover:opacity-80">
                   Buy Now

@@ -1,0 +1,154 @@
+{
+  "intents": [
+    {
+      "tag": "greeting",
+      "patterns": [
+        "Hi",
+        "Hey",
+        "How are you",
+        "Is anyone there?",
+        "Hello",
+        "Good day",
+        "Kiểm tra giúp mình xem sản phẩm này còn không",
+        "Xin chào",
+        "Tôi cần tư vấn"
+      ],
+      "responses": [
+        "Hey :-)",
+        "Hello, thanks for visiting",
+        "Hi there, what can I do for you?",
+        "Hi there, how can I help?",
+        "Hello 😁, mình rất sẳn lòng để tư vấn. Bạn cần tư vấn gì?"
+      ]
+    },
+    {
+      "tag": "goodbye",
+      "patterns": ["Bye", "See you later", "Goodbye"],
+      "responses": [
+        "See you later, thanks for visiting",
+        "Have a nice day",
+        "Bye! Come back again soon."
+      ]
+    },
+    {
+      "tag": "thanks",
+      "patterns": ["Thanks", "Thank you", "That's helpful", "Cảm ơn bạn"],
+      "responses": ["Happy to help!", "Any time!", "My pleasure", "Không có gì, nếu có bất kì câu hỏi nào khác, bạn cứ hỏi nhé!"]
+    },
+    {
+      "tag": "items",
+      "patterns": [
+        "Which items do you have?",
+        "What kinds of items are there?",
+        "What do you sell?"
+      ],
+      "responses": [
+        "We sell computers, graphic cards, and other accessories",
+        "We have a wide range of computer hardware."
+      ]
+    },
+    {
+      "tag": "payments",
+      "patterns": [
+        "Do you take credit cards?",
+        "Do you accept Mastercard?",
+        "Can I pay with Paypal?",
+        "Are you cash only?"
+      ],
+      "responses": [
+        "We accept VISA, Mastercard and Paypal",
+        "We accept most major credit cards, and Paypal."
+      ]
+    },
+    {
+      "tag": "delivery",
+      "patterns": [
+        "How long does delivery take?",
+        "How long does shipping take?",
+        "When do I get my delivery?"
+      ],
+      "responses": [
+        "Delivery takes 2-4 business days",
+        "Shipping takes 2-4 business days"
+      ]
+    },
+    {
+      "tag": "funny",
+      "patterns": [
+        "Tell me a joke!",
+        "Tell me something funny!",
+        "Do you know a joke?"
+      ],
+      "responses": [
+        "Why did the scarecrow win an award? Because he was outstanding in his field.",
+        "What do you call a fake noodle? An Impasta."
+      ]
+    },
+    {
+      "tag": "gpu_recommendation",
+      "patterns": [
+        "I need a good graphics card for gaming",
+        "What's the best GPU for 4K gaming?",
+        "Recommend a GPU for video editing",
+        "Which graphic card should I buy?"
+      ],
+      "responses": [
+        "For high-end gaming, we recommend the NVIDIA GeForce RTX 4080 or AMD Radeon RX 7900 XTX. They offer excellent performance for 4K gaming and creative workloads.",
+        "A great mid-range option is the NVIDIA GeForce RTX 4060. It provides a solid balance of price and performance for 1080p and 1440p gaming.",
+        "If you are on a budget, the AMD Radeon RX 6600 is a fantastic choice for 1080p gaming."
+      ]
+    },
+    {
+      "tag": "cpu_recommendation",
+      "patterns": [
+        "What CPU do you recommend?",
+        "Best CPU for gaming?",
+        "I need a processor for my new build",
+        "Which processor is good for programming?"
+      ],
+      "responses": [
+        "For top-tier performance in gaming and productivity, consider the Intel Core i9-13900K or the AMD Ryzen 9 7950X.",
+        "The Intel Core i5-13600K and AMD Ryzen 5 7600X are excellent mid-range CPUs that offer great value for most users and gamers.",
+        "For a budget-friendly build, the AMD Ryzen 5 5600 is a very capable processor."
+      ]
+    },
+    {
+      "tag": "ask_price_cpu",
+      "patterns": [
+        "Giá của CPU Intel Core i9 là bao nhiêu?",
+        "Con chip AMD Ryzen 7 giá sao?",
+        "Báo giá cho mình con i5-13600K",
+        "How much is the Ryzen 5 7600X?"
+      ],
+      "responses": [
+        "Giá cho các dòng CPU có thể thay đổi liên tục. Bạn vui lòng truy cập website hoặc liên hệ trực tiếp để có giá chính xác nhất nhé! Bạn có thể cho mình biết mã sản phẩm CPU cụ thể bạn đang quan tâm không ạ?"
+      ]
+    },
+    {
+      "tag": "check_stock",
+      "patterns": [
+        "Bên mình còn card màn hình RTX 4070 không?",
+        "Màn hình Dell Ultrasharp còn hàng không shop?",
+        "Kiểm tra giúp mình xem sản phẩm này còn không",
+        "Is this item in stock?"
+      ],
+      "responses": [
+        "Để kiểm tra tình trạng tồn kho, bạn vui lòng cung cấp mã sản phẩm hoặc tên đầy đủ của sản phẩm nhé.",
+        "Hàng hóa của chúng tôi được cập nhật liên tục. Bạn có thể kiểm tra trực tiếp trên website để có thông tin chính xác nhất."
+      ]
+    },
+    {
+  "tag": "ask_warranty",
+  "patterns": [
+    "Chế độ bảo hành cho màn hình này thế nào?",
+    "Sản phẩm được bảo hành bao lâu?",
+    "Nếu sản phẩm lỗi thì sao?",
+    "What's the warranty policy?"
+  ],
+  "responses": [
+    "Các sản phẩm của chúng tôi được bảo hành chính hãng từ 12 đến 36 tháng tùy loại. Bạn có thể cho biết sản phẩm bạn quan tâm không?",
+    "Chính sách bảo hành của chúng tôi là 1 đổi 1 trong 30 ngày đầu nếu có lỗi từ nhà sản xuất, và bảo hành theo tiêu chuẩn của hãng trong thời gian còn lại."
+  ]
+}
+  ]
+}

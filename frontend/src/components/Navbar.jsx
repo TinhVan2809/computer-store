@@ -16,7 +16,7 @@ function Navbar() {
 
   return (
     <>
-      <header className="navbar-container w-full md:w-[80%] lg:w-[60%] m-auto sticky z-100 top-3 mt-10 transition bg-white shadow-2xl rounded-[40px] px-4 md:px-10">
+      <header className="navbar-container w-full md:w-[80%] lg:w-[65%] m-auto sticky z-100 top-3 mt-10 transition bg-white shadow-2xl rounded-[40px] px-4 md:px-10">
         <div id="nav-content" className="flex justify-between md:justify-center items-center w-full py-4 md:py-5 gap-4 md:gap-10">
           {/* Logo */}
           <div className="shrink-0">
@@ -50,6 +50,8 @@ function Navbar() {
           {currentUser ? (
             <>
               <div className="flex justify-between items-center gap-6 cursor-pointe p-1.5 px-2.5 bg-gray-100 rounded-3xl transition duration-500 shrink-0">
+                {/*Searching*/}
+                <i className="ri-search-line text-[24px] cursor-pointer transition duration-200 px-1.5 rounded-[50%]"></i>
                 {/*Profile*/}
                 <i
                   className="ri-user-line text-[24px] cursor-pointer transition duration-200 bg-white px-1.5 rounded-[50%]"
