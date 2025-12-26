@@ -204,14 +204,25 @@ function Carts() {
             </>
         )
     }
+
     
     return (
       <>
         <NavbarCart />
 
         {cart.length > 0 ? <div className="cart-items">
-          {cart.map((item) => (
-            <div
+          {cart.map((item) => {
+            const price = Number(item.product_price) || 0;
+            const sale = Number(item.product_sale) || 0;
+            const saleClamped = Math.max(0, Math.min(100, sale));
+            const discounted = price * (1 - saleClamped / 100);
+            const formatter = new Intl.NumberFormat("en-EN", {
+                  style: "currency",
+                  currency: "USD",
+            });
+            
+           return (
+             <div
               key={item.cart_id}
               className={`cart-item ${
                 selectedItems.includes(item.cart_id) ? "selected" : ""
@@ -230,8 +241,7 @@ function Carts() {
               />
               <div className="item-details">
                 <p>{item.product_name}</p>
-                <p>$ {item.product_price*(1 - item.product_sale / 100)}</p>
-                {/* Thêm các chi tiết khác nếu cần */}
+                <p>{formatter.format(discounted)}</p>
               </div>
               <div className="quantity-control">
                 <button
@@ -275,10 +285,12 @@ function Carts() {
                 </button>
               </div>
             </div>
-          ))}
+           );
+          })}
         </div> : (
             <div className="">Ở đây trống trãi quá.</div>
-        )}
+           )
+        }
 
         <SumController
           totalPrice={totalSelectedPrice}

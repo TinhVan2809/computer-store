@@ -74,7 +74,7 @@ function ProductList({ products }) {
                   <div className="flex flex-col w-full justify-center items-center text-center mt-2">
                     <div className={`${saleClamped <= 0 ? 'sale-none' : 'absolute top-0 right-0 bg-red-600 px-2 rounded-bl-md'}`}>
                       <span className="text-[12px] text-white">
-                        {saleClamped} <sup>%</sup>
+                       - {saleClamped} <sup>%</sup>
                       </span>
                     </div>
                     <div className="min-w-0">
