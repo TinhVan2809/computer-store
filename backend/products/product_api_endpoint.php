@@ -102,6 +102,7 @@ try {
             $manufacturer_id = $_POST['manufacturer_id'] ?? null;
             $imageFile = $_FILES['image_main'] ?? null;
             $sale = $_POST['product_sale'] ?? '0';
+            $category_id = $_POST['category_id'] ?? null;
 
             if (empty($name) || empty($price)) {
                 sendJson(['success' => false, 'message' => 'Product name and price required'], 400);
@@ -112,7 +113,7 @@ try {
             }
 
             // Note: addProduct signature expects ($name, $price, $quantity, $description, $product_sale, $manufacturer_id, $image_file)
-            $result = $productObj->addProduct($name, $price, $quantity, $description, $sale, $manufacturer_id, $imageFile);
+            $result = $productObj->addProduct($name, $price, $quantity, $description, $sale, $manufacturer_id, $imageFile, $category_id);
 
             if ($result) {
                 sendJson([
@@ -138,6 +139,7 @@ try {
             $manufacturer_id = $_POST['manufacturer_id'] ?? null;
             $imageFile = $_FILES['image_main'] ?? null;
             $sale = $_POST['product_sale'] ?? '0';
+            $category_id = $_POST['category_id'] ?? null;
 
             if (!$id || empty($name) || empty($price)) {
                 sendJson(['success' => false, 'message' => 'Product ID, name, and price required'], 400);
@@ -148,7 +150,7 @@ try {
             }
 
             // Note: updateProduct signature expects ($id, $name, $price, $quantity, $description, $product_sale, $manufacturer_id, $image_file)
-            $result = $productObj->updateProduct($id, $name, $price, $quantity, $description, $sale, $manufacturer_id, $imageFile);
+            $result = $productObj->updateProduct($id, $name, $price, $quantity, $description, $sale, $manufacturer_id, $imageFile, $category_id);
 
             if ($result) {
                 sendJson(['success' => true, 'message' => 'Product updated successfully']);

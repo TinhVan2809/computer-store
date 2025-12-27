@@ -8,6 +8,7 @@ import { NavLink } from 'react-router-dom';
 function Products() {
   const [products, setProducts] = useState([]);
   const [manufacturers, setManufacturers] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showForm, setShowForm] = useState(false);
@@ -17,14 +18,19 @@ function Products() {
 
   const PRODUCTS_API = 'http://localhost/computer-store/backend/products/product_api_endpoint.php';
   const MANUFACTURERS_API = 'http://localhost/computer-store/backend/manufacturers/manufacturer_api_endpoint.php';
+  const CATEGORIES_API = 'http://localhost/computer-store/backend/categories/category_api_endpoint.php';
+
   const LIMIT = 10;
 
   // Fetch manufacturers for dropdown
   useEffect(() => {
     fetchManufacturers();
+    fetchCatogeries();
     fetchProducts(0);
   }, []);
 
+  
+  // Fetch Manufactures
   const fetchManufacturers = async () => {
     try {
       const response = await fetch(`${MANUFACTURERS_API}?action=get_all&limit=100`);
@@ -36,6 +42,19 @@ function Products() {
       console.error('Error fetching manufacturers:', err);
     }
   };
+
+  // Fetch catogeries
+  const fetchCatogeries = async () => {
+    try{
+      const response = await fetch(`${CATEGORIES_API}?action=get&limit=100`);
+      const data = await response.json();
+      if(data.success) {
+        setCategories(data.data);
+      }
+    } catch (err) {
+      console.error("error fetching catogeries: ", err);
+    }
+  }
 
   // Fetch products
   const fetchProducts = async (page = 0) => {
@@ -206,6 +225,7 @@ function Products() {
           onCancel={handleCancel}
           editingId={editingId}
           manufacturers={manufacturers}
+          categories={categories}
         />
       )}
 

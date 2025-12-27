@@ -77,7 +77,7 @@
             try{
                 $db = Database::getInstance();
                 $connection = $db->getConnection();
-                $sql = "SELECT p.product_id, p.product_name, p.product_price, p.product_sale,
+                $sql = "SELECT p.product_id, p.product_name, p.product_price, p.product_sale, p.category_id,
                                p.image_main, 
                                COALESCE(AVG(v.rating), 0) AS rating, 
                                m.manufacturer_name, m.manufacturer_logo_image
@@ -126,7 +126,7 @@
         * @param array $image_file - $_FILES['image_main'] (optional)
         * @return int|false - Inserted product ID or false
         */
-       public function addProduct($product_name, $product_price, $product_quantity = '0', $product_description = '', $product_sale = '0', $manufacturer_id = null, $image_file = null) {
+       public function addProduct($product_name, $product_price, $product_quantity = '0', $product_description = '', $product_sale = '0', $manufacturer_id = null, $image_file = null, $category_id = null) {
 
             $product_name = trim((string)$product_name);
             $product_price = (float)$product_price;
@@ -156,8 +156,8 @@
                     }
                 }
 
-                $sql = "INSERT INTO products (product_name, product_price, product_quantity, product_description, manufacturer_id, image_main, product_created_at, product_sale)
-                        VALUES (:product_name, :product_price, :product_quantity, :product_description, :manufacturer_id, :image_main, NOW(), :product_sale)";
+                $sql = "INSERT INTO products (product_name, product_price, product_quantity, product_description, manufacturer_id, image_main, product_created_at, product_sale, category_id)
+                        VALUES (:product_name, :product_price, :product_quantity, :product_description, :manufacturer_id, :image_main, NOW(), :product_sale, :category_id)";
 
                 $stmt = $connection->prepare($sql);
 
@@ -172,6 +172,12 @@
                     $stmt->bindValue(':manufacturer_id', null, PDO::PARAM_NULL);
                 } else {
                     $stmt->bindValue(':manufacturer_id', $manufacturer_id, PDO::PARAM_INT);
+                }
+
+                if ($category_id === null) {
+                    $stmt->bindValue(':category_id', null, PDO::PARAM_NULL);
+                } else {
+                    $stmt->bindValue(':category_id', $category_id, PDO::PARAM_INT);
                 }
 
                 if ($stmt->execute()) {
@@ -295,7 +301,7 @@
         * @param array $image_file - $_FILES['image_main'] (optional, replaces old image)
         * @return bool - true on success, false on failure
         */
-       public function updateProduct($product_id, $product_name, $product_price, $product_quantity = '0', $product_description = '', $product_sale = '0', $manufacturer_id = null, $image_file = null) {
+       public function updateProduct($product_id, $product_name, $product_price, $product_quantity = '0', $product_description = '', $product_sale = '0', $manufacturer_id = null, $image_file = null, $category_id = null) {
             
             $product_id = (int)$product_id;
             $product_name = trim((string)$product_name);
@@ -304,6 +310,7 @@
             $product_description = trim((string)$product_description);
             $product_sale = (float)$product_sale;
             $manufacturer_id = $manufacturer_id !== null ? (int)$manufacturer_id : null;
+            $category_id = $category_id !== null ? (int)$category_id : null;
 
             if ($product_id <= 0 || $product_name === '' || $product_price < 0) {
                 error_log("Error: Invalid product ID, name, or price");
@@ -348,6 +355,7 @@
                             product_description = :product_description,
                             product_sale = :product_sale,
                             manufacturer_id = :manufacturer_id,
+                            category_id = :category_id,
                             image_main = :image_main,
                             product_update_at = NOW()
                         WHERE product_id = :product_id";
@@ -366,6 +374,12 @@
                     $stmt->bindValue(':manufacturer_id', null, PDO::PARAM_NULL);
                 } else {
                     $stmt->bindValue(':manufacturer_id', $manufacturer_id, PDO::PARAM_INT);
+                }
+
+                if ($category_id === null) {
+                    $stmt->bindValue(':category_id', null, PDO::PARAM_NULL);
+                } else {
+                    $stmt->bindValue(':category_id', $category_id, PDO::PARAM_INT);
                 }
 
                 $execResult = $stmt->execute();

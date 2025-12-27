@@ -4,10 +4,10 @@
 
     class categories_class {
 
-        public function getCategories(int $limit = 10, int $offset = 0) {
+        public function getCategories(int $limit = 100, int $offset = 0) {
             try{
                 // sanitize/normalize inputs
-                $limit = $limit > 0 ? $limit : 10;
+                $limit = $limit > 0 ? $limit : 100;
                 $offset = $offset >= 0 ? $offset : 0;
 
                 $db = Database::getInstance();

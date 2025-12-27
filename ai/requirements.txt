@@ -2,3 +2,13 @@ torch
 transformers
 numpy
 scikit-learn
+python-dotenv
+langchain
+langchain-openai
+langchain-community
+langchain-huggingface
+huggingface-hub
+faiss-cpu
+sentence-transformers
+ollama
+duckduckgo-search

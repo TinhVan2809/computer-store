@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-function ProductForm({ onSave, onCancel, editingId, manufacturers }) {
+function ProductForm({ onSave, onCancel, editingId, manufacturers, categories }) {
   const [formData, setFormData] = useState({
     name: '',
     price: '',
@@ -8,7 +8,8 @@ function ProductForm({ onSave, onCancel, editingId, manufacturers }) {
     description: '',
     sale: '0',
     manufacturer_id: '',
-    image_main: null
+    image_main: null,
+    category_id: ''
   });
 
   const [secondaryImages, setSecondaryImages] = useState([]); // Files selected for upload
@@ -42,7 +43,8 @@ function ProductForm({ onSave, onCancel, editingId, manufacturers }) {
           description: product.product_description || '',
           sale: product.product_sale || '0',
           manufacturer_id: product.manufacturer_id || '',
-          image_main: null
+          image_main: null,
+          category_id: product.category_id || ''
         });
         if (product.image_main) {
           setPreviewImage(
@@ -266,6 +268,7 @@ function ProductForm({ onSave, onCancel, editingId, manufacturers }) {
       submitFormData.append('description', formData.description);
       submitFormData.append('product_sale', formData.sale);
       submitFormData.append('manufacturer_id', formData.manufacturer_id);
+      submitFormData.append('category_id', formData.category_id);
 
       if (formData.image_main) {
         submitFormData.append('image_main', formData.image_main);
@@ -367,6 +370,24 @@ function ProductForm({ onSave, onCancel, editingId, manufacturers }) {
             ))}
           </select>
         </div>
+
+         <div className="form-group">
+          <label htmlFor="category_id"> Loại sản phẩm</label>
+          <select
+            id="category_id"
+            name="category_id"
+            value={formData.category_id}
+            onChange={handleInputChange}
+          >
+            <option value="">-- Chọn Loại sản phẩm --</option>
+            {categories.map(c => (
+              <option key={c.category_id} value={c.category_id}>
+                {c.category_name}
+              </option>
+            ))}
+          </select>
+        </div>
+
       </div>
 
       <div className="form-group">

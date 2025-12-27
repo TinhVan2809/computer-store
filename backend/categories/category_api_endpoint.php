@@ -56,7 +56,7 @@ function sendJson($payload, int $status = 200) {
 
             case 'get':
                 $page = filter_input(INPUT_GET, 'page', FILTER_VALIDATE_INT, ['options' => ['default' => 1, 'min_range' => 1]]) ?: 1;
-                $limit = filter_input(INPUT_GET, 'limit', FILTER_VALIDATE_INT, ['options' => ['default' => 10, 'min_range' => 1]]) ?: 10;
+                $limit = filter_input(INPUT_GET, 'limit', FILTER_VALIDATE_INT, ['options' => ['default' => 100, 'min_range' => 1]]) ?: 100;
 
                 $offset = ($page - 1) * $limit;
                 $totalItems = (int)$categoriesObj->getCountCategories();
