@@ -25,8 +25,10 @@ function Carts() {
         limit: 10
     });
 
+     const userId = currentUser?.id;
+
     const fetchCartData = useCallback(async (page = 1) => {
-        if (!currentUser) {
+        if (!userId) {
             setError("Bạn cần đăng nhập để xem giỏ hàng.");
             setCart([]);
             return;
@@ -35,7 +37,7 @@ function Carts() {
         setError('');
         try {
             const response = await fetch(
-                `${API_CART}?action=get&user_id=${currentUser.id}&page=${page}&limit=${pagination.limit}`
+                `${API_CART}?action=get&user_id=${userId}&page=${page}&limit=${pagination.limit}`
             );
             const data = await response.json();
 
@@ -55,11 +57,11 @@ function Carts() {
         } finally {
             setLoading(false);
         }
-    }, [currentUser, pagination.limit]);
+    }, [userId, pagination.limit]);
 
     useEffect(() => {
         fetchCartData(pagination.current_page);
-    }, [currentUser, fetchCartData, pagination.current_page]);
+     }, [fetchCartData, pagination.current_page]);
 
     const handleQuantityChange = async (cart_id, newQuantity) => {
         // Cập nhật giao diện ngay lập tức để tạo cảm giác mượt mà
@@ -210,7 +212,7 @@ function Carts() {
       <>
         <NavbarCart />
 
-        {cart.length > 0 ? <div className="cart-items">
+        {cart.length > 0 ? <div className="cart-items flex flex-col w-full py-10 px-30 gap-10">
           {cart.map((item) => {
             const price = Number(item.product_price) || 0;
             const sale = Number(item.product_sale) || 0;
@@ -228,7 +230,8 @@ function Carts() {
                 selectedItems.includes(item.cart_id) ? "selected" : ""
               }`}
             >
-              <input
+              <div className="flex justify-start items-center gap-5">
+                <input
                 type="checkbox"
                 className="item-checkbox"
                 checked={selectedItems.includes(item.cart_id)}
@@ -237,13 +240,16 @@ function Carts() {
               <img
                 src={`http://localhost/computer-store/backend/uploads/products_img/${item.image_main}`}
                 alt={item.product_name}
-                className="item-image w-50"
+                className="item-image w-20 object-contain"
               />
               <div className="item-details">
-                <p>{item.product_name}</p>
-                <p>{formatter.format(discounted)}</p>
+                <p className="cursor-pointer" onClick={() => navigate(`/detail/${item.product_id}`)}>{item.product_name}</p>
+                <p className="text-red-500">{formatter.format(discounted)}</p>
               </div>
-              <div className="quantity-control">
+              </div>
+
+              <div className="flex gap-9">
+                <div className="quantity-control flex gap-3 justify-center items-center">
                 <button
                   onClick={() =>
                     handleQuantityChange(
@@ -251,11 +257,12 @@ function Carts() {
                       parseInt(item.quantity) - 1
                     )
                   }
+                  className="bg-stone-800 w-7 text-white cursor-pointer hover:opacity-80"
                 >
                   -
                 </button>
                 <input
-                  type="number"
+                  type="text"
                   value={item.quantity}
                   onChange={(e) =>
                     handleQuantityChange(
@@ -264,6 +271,7 @@ function Carts() {
                     )
                   }
                   min="1"
+                  className="w-10 text-[17px] text-center"
                 />
                 <button
                   onClick={() =>
@@ -272,18 +280,21 @@ function Carts() {
                       parseInt(item.quantity) + 1
                     )
                   }
+                  className="bg-stone-800 w-7 text-white cursor-pointer hover:opacity-80"
                 >
                   +
                 </button>
               </div>
               <div className="item-actions">
                 <button
-                  className="delete-btn"
+                  className="delete-btn text-red-800 cursor-pointer hover:underline"
                   onClick={() => onDeleteItem(item.cart_id, item.product_name)}
                 >
-                  Xóa
+                  Remove
                 </button>
               </div>
+              </div>
+              
             </div>
            );
           })}

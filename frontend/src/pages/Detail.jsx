@@ -75,7 +75,7 @@ function Detail() {
   return (
     <>
       <section id="product_detail_container" className="w-full py-10">
-        <div className="product_detail_container_content w-[1250px] max-w-[1250px] flex gap-10 m-auto">
+        <div className="product_detail_container_content w-[1250px] max-w-[1250px] flex gap-10 m-auto" key={product.product_id}>
           <div className="right flex w-[50%] flex-col p-5  ">
             <div className="size-fit">
               <img
@@ -102,7 +102,7 @@ function Detail() {
               <div className="flex w-full flex-col gap-1 justify-start items-start">
                 <div className="flex flex-col gap-0 w-full justify-start items-start text-start">
                   <img
-                    className="w-auto h-3 object-cover"
+                    className={product.manufacturer_logo_image ? "w-auto h-3 object-cover" : "hidden"}
                     src={`http://localhost/computer-store/backend/uploads/manufacturers_img/${product.manufacturer_logo_image}`}
                     alt={product.manufacturer_name}
                   />
@@ -164,7 +164,7 @@ function Detail() {
           <div className="w-full justify-start flex">
               <div className="flex justify-center items-center">
                 <button className="border border-gray-300 w-9 py-1 cursor-pointer">-</button>
-                <input className="w-11 text-stone-800 py-1 flex text-center" type="text" role="spinbutton" aria-live="assertive" aria-valuenow="1" value="1" />
+                <input className="w-11 text-stone-800 py-1 flex text-center" type="text" role="spinbutton" aria-live="assertive" aria-valuenow="1" defaultValue="1" />
                 <button className="border border-gray-300 w-9 py-1 cursor-pointer">+</button>
               </div>
           </div>

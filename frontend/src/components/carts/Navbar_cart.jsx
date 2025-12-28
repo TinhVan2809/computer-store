@@ -7,7 +7,7 @@ function NavbarCart() {
             <header id='navbar_cart' className="w-full bg-white shadow-sm py-8.5 px-40 flex justify-between items-center"> 
                 <div className="flex justify-between items-center gap-2">
                     <img className='h-10 w-10 rounded-[50%]' src="/public/images/logo.png" />
-                    <span className='text-2xl text-stone-600'>Hasekimagru</span>
+                    <p className='text-2xl text-stone-600'><span className='font-bold text-violet-800'>A</span>WAY-STORE</p>
                 </div>
                 <div id="navbar_link" className="flex gap-10 justify-center items-center">
                     <div id="links" className="flex mr-10">

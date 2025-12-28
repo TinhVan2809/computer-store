@@ -49,31 +49,6 @@
 
 .cart-item {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
-    padding: 1rem;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    transition: background-color 0.2s;
-}
-
-.cart-item.selected {
-    background-color: #f0f9ff;
-    border-color: #3b82f6;
-}
-
-.item-checkbox {
-    margin-right: 1rem;
-    width: 20px;
-    height: 20px;
-}
-
-.cart-summary {
-    margin-top: 2rem;
-    padding: 1rem;
-    text-align: right;
-}
-
-#modal_comfirm_delete{
-    background-color: rgba(128, 128, 128, 0.467);
 }

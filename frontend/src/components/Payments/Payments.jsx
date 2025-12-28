@@ -1,13 +1,52 @@
+import { useContext, useEffect, useState, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import UserContext from '../../context/UserContext';
+
+const API_ADDRESSES = "http://localhost/computer-store/backend/addresses/address_api_endpoint.php";
+const LIMIT = 5;
 
 function Payments() {
     const location = useLocation();
     const navigate = useNavigate();
+
+    const {currentUser} = useContext(UserContext);
+    const userId = currentUser?.id;
+
+    const [addresses, setAddresses] = useState([]);
     
-    // Nhận dữ liệu được truyền từ trang giỏ hàng
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalCount, setTotalCount] = useState(0);
+
+     // Nhận dữ liệu được truyền từ trang giỏ hàng
     const { items, totalPrice } = location.state || {};
 
     const formatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+    
+    
+    const fetchAddressesData = useCallback(async (page = 0) => {
+       try{
+        if (!userId) {
+            return;
+        }
+
+        const response = await fetch(`${API_ADDRESSES}?action=get&page=${page + 1}&limit=${LIMIT}&user_id=${userId}`)
+        const data = await response.json();
+        if(data.success) {
+            setAddresses(data.data);
+            setTotalCount(data.total_items);
+            setCurrentPage(page)
+        }
+
+       } catch(err) {
+        console.error("error fetching Addresses", err);
+       }
+    }, [userId]);
+
+    useEffect(() => {
+        fetchAddressesData();
+    }, [fetchAddressesData])
+    
+    
 
     // Nếu không có sản phẩm nào được truyền qua, điều hướng về trang chủ
     if (!items || items.length === 0) {

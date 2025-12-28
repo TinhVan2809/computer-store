@@ -121,7 +121,6 @@ function Manufacturers() {
 
   return (
     <>
-    <NavLink to='/'>Home</NavLink>
 
     <div className="manufacturers-container">
       <div className="manufacturers-header">

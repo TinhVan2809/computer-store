@@ -33,7 +33,7 @@ function Products() {
   // Fetch Manufactures
   const fetchManufacturers = async () => {
     try {
-      const response = await fetch(`${MANUFACTURERS_API}?action=get_all&limit=100`);
+      const response = await fetch(`${MANUFACTURERS_API}?action=get_all&limit=${LIMIT}`);
       const data = await response.json();
       if (data.success) {
         setManufacturers(data.data);
@@ -204,7 +204,6 @@ function Products() {
 
   return (
     <>
-    <NavLink to='/'>Home</NavLink>
     
     <div className="products-container">
       <div className="products-header">

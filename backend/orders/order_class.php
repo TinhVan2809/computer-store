@@ -10,7 +10,6 @@
                 $db = Database::getInstance();
                 $connection = $db->getConnection();
 
-              
 
             } catch(PDOException $e) {
                 error_log("Error Getting Oder By User ." . $e->getMessage());

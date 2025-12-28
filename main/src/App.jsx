@@ -13,9 +13,8 @@ import Categories from './pages/Categories';
 function App() {  
   return (
     <>
-      <Navbar />
-
       <BrowserRouter>
+        <Navbar />
         <Routes>
           <Route path='/' element={<Home />} />
           <Route path="/manufacturers" element={<Manufacturers />} />

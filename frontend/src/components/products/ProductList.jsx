@@ -82,7 +82,7 @@ function ProductList({ products }) {
                     </div>
                     <div className="product_price w-full flex items-end justify-between mt-[5px] px-2">
                         <div className="product_manufacturer_name flex w-full justify-start items-center gap-1">
-                            <img className='w-[15px] h-[15px] object-cover rounded-[50%]' src={`http://localhost/computer-store/backend/uploads/manufacturers_img/${p.manufacturer_logo_image}`} alt={p.manufacturer_name} />
+                            <img className={p.manufacturer_logo_image ? 'w-[15px] h-[15px] object-cover rounded-[50%]' : 'hidden'} src={`http://localhost/computer-store/backend/uploads/manufacturers_img/${p.manufacturer_logo_image}`} alt={p.manufacturer_name} />
                             <span className='text-[10px] text-gray-500 bg-[#e7f3ff] rounded-[3px] px-1'>{p.manufacturer_name}</span>
                         </div>
                       {saleClamped > 0 ? (

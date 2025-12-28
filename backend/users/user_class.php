@@ -117,7 +117,7 @@ class Users_class {
             $db = Database::getInstance();
             $connection = $db->getConnection();
             // include LIMIT/OFFSET so pagination works as expected
-            $sql = "SELECT user_id, username, email, avata, role, phone, address, gender, user_created_at FROM users ORDER BY user_created_at DESC LIMIT :limit OFFSET :offset";
+            $sql = "SELECT user_id, username, email, avata, role, phone, address, gender FROM users ORDER BY user_created_at DESC LIMIT :limit OFFSET :offset";
             $get = $connection->prepare($sql);
             $get->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
             $get->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
