@@ -124,6 +124,39 @@ app.post("/logout", (req, res) => {
     res.clearCookie("token").json({ message: "Logout successful" });
 });
 
+// API for provinces, districts, wards
+app.get("/api/provinces", async (req, res) => {
+    try {
+        const response = await fetch("https://provinces.open-api.vn/api/p/");
+        const data = await response.json();
+        res.json(data);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching provinces", error: error.message });
+    }
+});
+
+app.get("/api/districts/:province_code", async (req, res) => {
+    try {
+        const { province_code } = req.params;
+        const response = await fetch(`https://provinces.open-api.vn/api/p/${province_code}?depth=2`);
+        const data = await response.json();
+        res.json(data.districts);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching districts", error: error.message });
+    }
+});
+
+app.get("/api/wards/:district_code", async (req, res) => {
+    try {
+        const { district_code } = req.params;
+        const response = await fetch(`https://provinces.open-api.vn/api/d/${district_code}?depth=2`);
+        const data = await response.json();
+        res.json(data.wards);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching wards", error: error.message });
+    }
+});
+
 
 app.listen(process.env.PORT, () =>
     console.log(`Server running on port ${process.env.PORT}`)

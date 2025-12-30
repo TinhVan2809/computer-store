@@ -87,6 +87,53 @@ try{
                 ]);
             break;
 
+            case 'add':
+                $user_id = null;
+                if (isset($_GET['user_id'])) {
+                    $user_id = filter_input(INPUT_GET, 'user_id', FILTER_VALIDATE_INT);
+                } elseif (isset($_POST['user_id'])) {
+                    $user_id = filter_input(INPUT_POST, 'user_id', FILTER_VALIDATE_INT);
+                } elseif (session_status() === PHP_SESSION_ACTIVE && !empty($_SESSION['user_id'])) {
+                    $user_id = (int) $_SESSION['user_id'];
+                }
+
+                if (!$user_id) {
+                    sendJson(['success' => false, 'message' => 'User ID required'], 400);
+                }
+
+                $data = json_decode(file_get_contents('php://input'), true);
+
+                $required_fields = ['recipient_name', 'phone', 'province_id', 'province_name', 'district_id', 'district_name', 'ward_id', 'ward_name', 'specific_address', 'label'];
+                foreach ($required_fields as $field) {
+                    if (empty($data[$field])) {
+                        sendJson(['success' => false, 'message' => "Missing required field: $field"], 400);
+                    }
+                }
+
+                $address_data = [
+                    'user_id' => $user_id,
+                    'recipient_name' => $data['recipient_name'],
+                    'phone' => $data['phone'],
+                    'province_id' => $data['province_id'],
+                    'province_name' => $data['province_name'],
+                    'district_id' => $data['district_id'],
+                    'district_name' => $data['district_name'],
+                    'ward_id' => $data['ward_id'],
+                    'ward_name' => $data['ward_name'],
+                    'specific_address' => $data['specific_address'],
+                    'is_default' => $data['is_default'] ?? 0,
+                    'label' => $data['label']
+                ];
+
+                $new_address_id = $addresses->add_address($address_data);
+
+                if ($new_address_id) {
+                    sendJson(['success' => true, 'message' => 'Address added successfully', 'address_id' => $new_address_id]);
+                } else {
+                    sendJson(['success' => false, 'message' => 'Failed to add address'], 500);
+                }
+            break;
+
 
              default:
                 http_response_code(400);

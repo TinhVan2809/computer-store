@@ -1,0 +1,26 @@
+@import 'tailwindcss';
+
+.addressForm {
+    background-color: rgba(236, 230, 230, 0.885);
+}
+
+.UIG4fr {
+    display: flex;
+    gap: 1rem;
+}
+
+.uSUvOh {
+    padding: 0.5rem 1rem;
+    border: 1px solid #e5e7eb;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.Xge0vM {
+    font-size: 0.875rem;
+}
+
+.PdLW1O {
+    border-color: #000;
+    background-color: #f3f4f6;
+}
