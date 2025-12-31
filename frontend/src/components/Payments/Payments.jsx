@@ -94,7 +94,7 @@ function Payments() {
   );
 
   useEffect(() => {
-    fetchAddressesData();
+    fetchAddressesData(); //eslint-disable-line
   }, [fetchAddressesData]);
 
   // Nếu không có sản phẩm nào được truyền qua, điều hướng về trang chủ

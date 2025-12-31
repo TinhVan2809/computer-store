@@ -11,11 +11,12 @@ function ProductList({ products }) {
 
     const [toastSuccessAddToCart, setToastSuccessAddToCart] = useState(false);
 
+    // Hàm thêm sản phẩm vào giỏ
     const HandleToggleCart = async (e, product_id) => {
         e.stopPropagation();
 
         if (!currentUser) {
-            navigate('/login');
+            navigate('/login')
             return;
         }
 

@@ -1,14 +1,27 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-
+import { useEffect, useState, useContext } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import UserContext from "../context/UserContext";
 import "../styles/Detail.css";
 
 const API_BASE =
   "http://localhost/computer-store/backend/products/product_api_endpoint.php";
+
+const API_URL = 'http://localhost/computer-store/backend/carts/cart_api_endpoint.php';
+
 function Detail() {
   const { product_id } = useParams();
   const [product, setProduct] = useState(null);
   const [existingSecondaryImages, setExistingSecondaryImages] = useState("");
+
+  const navigate = useNavigate();
+  const { currentUser, refreshCartCount } = useContext(UserContext);
+
+  // toast thông báo thêm sản phẩm vào giỏ thành công
+  const [toastSuccessAddToCart, setToastSuccessAddToCart] = useState(false);
+
+  // toast thông báo yêu cầu đăng nhập để thêm giỏ hàng hoặc mua ngay
+  const [toastLoginReuired, setToastLoginReuired] = useState(false);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -71,6 +84,41 @@ function Detail() {
     style: "currency",
     currency: "USD",
   });
+
+
+  // Hàm thêm sản phẩm vào giỏ
+    const HandleToggleCart = async (e, product_id) => {
+      e.stopPropagation();
+        if (!currentUser) {
+            setToastLoginReuired(true);
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_URL}?action=add`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: currentUser.id,
+                    product_id: product_id,
+                }),
+            });
+
+            const result = await response.json();
+            setToastSuccessAddToCart(true);
+            setTimeout(() => {
+              setToastSuccessAddToCart(false);
+            }, 2000);
+            if (result.success) {
+                refreshCartCount(); // Cập nhật số lượng trên Navbar
+            }
+        } catch (error) {
+            console.error('Failed to add product to cart:', error);
+            alert('Đã có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng.');
+        }
+    };
 
   return (
     <>
@@ -170,7 +218,7 @@ function Detail() {
           </div>
 
               <div className="flex justify-start items-center bottom-0 py-2 gap-3 w-full">
-                <button className="p-3 border border-gray-300 w-[210px] rounded-[25px] cursor-pointer transition duration-500">
+                <button className="p-3 border border-gray-300 w-[210px] rounded-[25px] cursor-pointer transition duration-500" onClick={(e) => HandleToggleCart(e, product.product_id)}>
                   <i className="fa-solid fa-cart-plus"></i>Add To Cart
                 </button>
                 <button className="p-3 border bg-stone-950 text-white w-[210px] rounded-[25px] cursor-pointer transition duration-300 hover:opacity-80">
@@ -181,6 +229,39 @@ function Detail() {
           </div>
         </div>
       </section>
+
+        {/* TOAST THÔNG BÁO ĐÃ THÊM SẢN PHẨM VÀO GIỎ HÀNG */}
+        {toastSuccessAddToCart && (
+          <div className="add_to_cart fixed z-100 flex justify-center items-center w-65 h-30 rounded-xl top-[40%] right-[43%]">
+            <div className="">
+              <i className="ri-check-line text-white text-[60px] p-3 rounded-[50%] bg-stone-700"></i>
+            </div>
+          </div>
+        )}
+
+        {/* TOAST THÔNG BÁO YÊU CẦU ĐĂNG NHẬP */}
+        {toastLoginReuired && (
+          <div className="fixed top-0 z-300 flex justify-center items-center w-full h-full bg-[#0000004f]">
+          <div className="bg-white flex flex-col p-6 shadow-2xl gap-10">
+            <div className="flex flex-1 flex-col justify-center items-center gap-5">
+              <p className="text-lg">Bạn cần đăng nhập để thêm sản phẩm vào giỏ.</p>
+              <i className="ri-shopping-basket-2-line text-7xl"></i>
+            </div>
+            <div className="w-full flex justify-end items-center gap-3">
+              <button className=" hover:opacity-70 py-1 px-4 rounded-[15px] cursor-pointer border border-gray-200" onClick={() => setToastLoginReuired(false)}>
+                Hủy
+              </button>
+              <button
+                className=" hover:opacity-70 py-1 px-4 rounded-[15px] cursor-pointer bg-black text-white"
+                onClick={() => navigate("/login")}
+              >
+                Đăng nhập
+              </button>
+            </div>
+          </div>
+        </div>
+        )}
+      
     </>
   );
 }
