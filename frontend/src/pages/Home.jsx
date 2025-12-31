@@ -1,14 +1,13 @@
 import Products from "./Products";
 import Banners from "../components/Banners";
+import '../styles/home.css';
 function Home() {
 
     return (
 
         <>
-
-            <Banners />
-
-            <div id="home" className="w-full py-2 px-10">
+            <Banners /> 
+            <div id="home" className="w-full px-10">
                 <Products />
             </div>
             

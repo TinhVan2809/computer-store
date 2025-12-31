@@ -1,42 +1,14 @@
 @import "tailwindcss";
 
-
-@media (max-width:1024px) {
-    .navbar-container {
-        width: 90%;
-    }
-}
-
 @media (max-width: 768px) {
   /* Dưới 768px: Mobile và Tablet dọc */
-  .navbar-container {
-    width: 100% !important;
-    position: fixed;
-    top: 0;
-    margin: 0;
-    border-radius: 0;
-  }
-
   .navbar-container #navbar_menu ul{
     gap: 10px;
   }
 }
 
 @media (max-width: 900px){
-    .navbar-container{
-        width: 100% !important;
-        position: fixed;
-        top: 0;
-        margin: 0;
-        border-radius: 0;
-    }
     .navbar-container #navbar_menu ul{
         gap: 10px;
-    }
-}
-
-@media (max-width: 1440px){
-     .navbar-container{
-        width: 90%;
     }
 }

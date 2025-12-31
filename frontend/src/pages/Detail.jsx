@@ -74,7 +74,7 @@ function Detail() {
 
   return (
     <>
-      <section id="product_detail_container" className="w-full py-10">
+      <section id="product_detail_container" className="w-full pt-10">
         <div className="product_detail_container_content w-[1250px] max-w-[1250px] flex gap-10 m-auto" key={product.product_id}>
           <div className="right flex w-[50%] flex-col p-5  ">
             <div className="size-fit">

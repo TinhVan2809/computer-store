@@ -73,7 +73,7 @@
         }
 
         // Get products with pagination
-       public function getProducts(int $limit = 50, int $offset = 0) {
+       public function getProducts(int $limit = 60, int $offset = 0) {
             try{
                 $db = Database::getInstance();
                 $connection = $db->getConnection();

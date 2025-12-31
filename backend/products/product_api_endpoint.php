@@ -57,7 +57,7 @@ try {
     switch ($action) {
         case 'getProducts':
             $page = filter_input(INPUT_GET, 'page', FILTER_VALIDATE_INT, ['options' => ['default' => 1, 'min_range' => 1]]) ?: 1;
-            $limit = filter_input(INPUT_GET, 'limit', FILTER_VALIDATE_INT, ['options' => ['default' => 50, 'min_range' => 1]]) ?: 50;
+            $limit = filter_input(INPUT_GET, 'limit', FILTER_VALIDATE_INT, ['options' => ['default' => 60, 'min_range' => 1]]) ?: 60;
             
             $offset = ($page - 1) * $limit;
             $totalItems = $productObj->getCountProducts();

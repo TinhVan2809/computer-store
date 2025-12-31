@@ -12,7 +12,7 @@ function Products() {
 
     // pagination state
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 50; 
+    const itemsPerPage = 60; 
 
    useEffect(() => {
     setLoading(true);

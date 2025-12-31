@@ -19,7 +19,7 @@
    }
 
     .product-container .products .card{
-      width: 180px;
+      width: 185px;
    }
 
    .product-container .products .card .product_price {
@@ -37,7 +37,7 @@
 
 @media (width < 600px){
    .product-container .products .card{
-      width: 190px !important;
+      width: 195px !important;
    }
 
    .product-container .products .card .product_price {
@@ -53,18 +53,18 @@
    }
 
      #home {
-      padding: 0 20px;
+      padding: 0;
    }
 
    .product-container .products{
-      gap: 10px;
+      gap: 0;
       row-gap: 20px;
    }
 }
 
 @media (max-width:1024px) {
    .product-container {
-      margin-top: 6rem;
+      margin-top: 1rem;
    }
    .product-container .products .card{
       width: 190px;
@@ -85,14 +85,12 @@
 
 @media (max-width: 425px) {
    .product-container .products .card{
-   width: 170px !important;
+   width: 175px !important;
   }
    #home {
-   padding: 0 20px;
+   padding: 0px;
   }
-
   .product-container .products{
-   gap: 10px;
    row-gap: 20px;
   }
 }
@@ -102,10 +100,10 @@
    width: 150px !important;
   }
    #home {
-   padding: 0 16px;
+   padding: 0;
   }
   .product-container .products{
-   gap: 10px !important;
+   gap: 5px !important;
    row-gap: 20px !important;
   }
 }
@@ -116,11 +114,49 @@
   }
 
    #home {
-   padding: 0 10px;
+   padding: 0;
   }
   .product-container .products{
    gap: 10px !important;
    row-gap: 20px !important;
   }
 } 
+
+@media (max-width: 360px) {
+  .product-container .products .card{
+   width: 160px !important;
+  }
+  .product-container .products{
+   gap: 0!important;
+   row-gap: 20px !important;
+  }
+}
+
+@media (max-width: 420px) {
+    .product-container .products .card{
+      width: 170px !important;
+  }
+   #home {
+   padding: 0;
+  }
+  .product-container .products{
+   gap: 0 !important;
+   row-gap: 20px !important;
+  }
+}
+
+@media (max-width: 320px) {
+ .product-container .products .card{
+      width: 150px !important;
+  }
+  
+   #home {
+   padding: 0;
+  }
+
+  .product-container .products{
+   gap: 0 !important;
+   row-gap: 20px !important;
+  }
+}
 
