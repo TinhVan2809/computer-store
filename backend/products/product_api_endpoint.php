@@ -290,9 +290,10 @@ try {
 } catch (PDOException $e) {
     error_log("General Error in product_api_endpoint.php: " . $e->getMessage() . " in " . $e->getFile() . " on line " . $e->getLine() . "\nStack trace:\n" . $e->getTraceAsString());
     sendJson(['success' => false, 'message' => 'An unexpected error occurred'], 500);
-} catch (Exception $e) {
-    error_log("Error in product_api_endpoint.php: " . $e->getMessage());
-    sendJson(['success' => false, 'message' => 'An error occurred'], 500);
 }
+//  catch (Exception $e) {
+//     error_log("Error in product_api_endpoint.php: " . $e->getMessage());
+//     sendJson(['success' => false, 'message' => 'An error occurred'], 500);
+// }
 
 ?>

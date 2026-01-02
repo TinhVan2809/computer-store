@@ -58,7 +58,7 @@ function Detail() {
         else throw new Error(prodJson.message || "No product");
 
         if (imgsJson.success) setExistingSecondaryImages(imgsJson.data);
-        else setExistingSecondaryImages([]); // optional fallback
+        else setExistingSecondaryImages([]);
       } catch (err) {
         if (err.name !== "AbortError") setError(err.message || "Fetch error");
       } finally {
@@ -245,7 +245,7 @@ function Detail() {
           <div className="bg-white flex flex-col p-6 shadow-2xl gap-10">
             <div className="flex flex-1 flex-col justify-center items-center gap-5">
               <p className="text-lg">Bạn cần đăng nhập để thêm sản phẩm vào giỏ.</p>
-              <i className="ri-shopping-basket-2-line text-7xl"></i>
+              <i className="ri-shopping-basket-2-line text-7xl text-stone-200"></i>
             </div>
             <div className="w-full flex justify-end items-center gap-3">
               <button className=" hover:opacity-70 py-1 px-4 rounded-[15px] cursor-pointer border border-gray-200" onClick={() => setToastLoginReuired(false)}>

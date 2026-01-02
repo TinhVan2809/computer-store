@@ -13,23 +13,26 @@ function Login() {
     
    const { setCurrentUser } = useContext(UserContext);
    const navigate = useNavigate();
+   // Admin URL configurable via Vite env var VITE_ADMIN_URL (set in `frontend/.env` or `.env.local`)
+   const ADMIN_URL = import.meta.env.VITE_ADMIN_URL || 'http://localhost:5174';
 
    const togglePasswordVisibility = () => {
         setPasswordVisible(!passwordVisible);
-    };
+    }; 
 
     async function handleLogin(e) {
         e.preventDefault();
-        try{
-            await API.post("/login", {email, password});
-            
-            const userDataRes = await API.get("/userData");
-            setCurrentUser(userDataRes.data.user);
+        try {
+            await API.post("/login", { email, password });
 
+            const userDataRes = await API.get("/userData");
+            const user = userDataRes.data.user;
+            setCurrentUser(user);
             setMessage("Login successfully!");
-            navigate('/'); // Redirect to homepage
-        } catch(err) {
-            setError('Something went wrong.', error.message);
+            navigate('/');
+        } catch (err) {
+            // Show backend message if available, otherwise generic message
+            setError(err?.response?.data?.message || err.message || 'Something went wrong');
             setMessage("Wrong username or password!");
             console.error(err);
         }

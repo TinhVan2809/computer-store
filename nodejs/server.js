@@ -12,19 +12,33 @@ const app = express();
 app.use(express.json());
 
 
-app.use(
-  cors({
-    origin: ["http://localhost:5173", 
-            "http://localhost:3000",
-            "http://localhost:5173",
-            "http://127.0.0.1:3000",
-            "http://127.0.0.1:5173",
-            "http://localhost:5174",
-            "http://localhost:5175",],
-    // Adjust this to your frontend's origin
-    credentials: true,
-  })
-);
+// Configure CORS using environment variables (FRONTEND_URL, ADMIN_URL)
+// Fall back to common localhost origins for development
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  process.env.ADMIN_URL,
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:3000',
+  'http://localhost:5174',
+  'http://localhost:5175',
+].filter(Boolean);
+
+app.use(cors({
+  origin: function(origin, callback) {
+    // allow non-browser tools or same-origin requests with no origin
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      return callback(null, true);
+    } else {
+      return callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 app.use(cookieParser());
 
 
@@ -84,12 +98,16 @@ app.post("/login", (req, res) => {
                 }
             );
 
-            res.cookie("token", token, {
+            // cookie options can be configured via env vars: COOKIE_DOMAIN and COOKIE_SAMESITE
+            const cookieOptions = {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
-                sameSite: "strict",
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: process.env.COOKIE_SAMESITE || 'strict', // set 'none' for cross-site (must have secure=true)
+                domain: process.env.COOKIE_DOMAIN || undefined,
                 maxAge: 24 * 60 * 60 * 1000 // 1 day
-            }).json({
+            };
+
+            res.cookie("token", token, cookieOptions).json({
                 message: "Login success"
             });
         }
@@ -121,7 +139,7 @@ app.get("/userData", auth, (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-    res.clearCookie("token").json({ message: "Logout successful" });
+    res.clearCookie("token", { domain: process.env.COOKIE_DOMAIN || undefined, path: '/' }).json({ message: "Logout successful" });
 });
 
 // API for provinces, districts, wards

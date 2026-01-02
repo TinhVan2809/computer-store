@@ -268,25 +268,47 @@ class Users_class {
      * @param int $user_id
      * @param array $data
      * @param array|null $avatarFile
-     * @return bool
+     * @return array|bool - true on success, or array with error message
      */
     public function updateUser($user_id, array $data, $avatarFile = null) {
         $user_id = (int)$user_id;
-        if ($user_id <= 0) return false;
+        if ($user_id <= 0) return ['error' => 'Invalid user ID'];
 
         try {
             $db = Database::getInstance();
             $connection = $db->getConnection();
 
-            // Fetch existing to get current avatar and password
+            // Fetch existing to get current avatar
             $getSql = "SELECT avata FROM users WHERE user_id = :user_id";
             $getStmt = $connection->prepare($getSql);
             $getStmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
             $getStmt->execute();
             $existing = $getStmt->fetch(PDO::FETCH_ASSOC);
-            if (!$existing) return false;
+            if (!$existing) return ['error' => 'User not found'];
 
             $oldAvatar = $existing['avata'];
+
+            // Validate email if provided
+            if (isset($data['email'])) {
+                $email = trim((string)$data['email']);
+                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    return ['error' => 'Invalid email format'];
+                }
+                if ($this->emailExists($email, $user_id)) {
+                    return ['error' => 'Email already exists'];
+                }
+            }
+
+            // Validate username if provided
+            if (isset($data['username'])) {
+                $username = trim((string)$data['username']);
+                if (strlen($username) < 3) {
+                    return ['error' => 'Username must be at least 3 characters'];
+                }
+                if ($this->usernameExists($username, $user_id)) {
+                    return ['error' => 'Username already exists'];
+                }
+            }
 
             // Prepare fields
             $fields = [];
@@ -296,20 +318,20 @@ class Users_class {
             if (isset($data['email'])) { $fields[] = 'email = :email'; $params[':email'] = trim((string)$data['email']); }
             if (isset($data['password']) && $data['password'] !== '') { $fields[] = 'password = :password'; $params[':password'] = password_hash($data['password'], PASSWORD_DEFAULT); }
             if (isset($data['role'])) { $role = in_array($data['role'], ['user','admin'], true) ? $data['role'] : 'user'; $fields[] = 'role = :role'; $params[':role'] = $role; }
-            if (array_key_exists('phone', $data)) { $fields[] = 'phone = :phone'; $params[':phone'] = $data['phone']; }
-            if (array_key_exists('address', $data)) { $fields[] = 'address = :address'; $params[':address'] = $data['address']; }
-            if (array_key_exists('gender', $data)) { $fields[] = 'gender = :gender'; $params[':gender'] = substr((string)$data['gender'], 0, 20); }
+            if (array_key_exists('phone', $data)) { $fields[] = 'phone = :phone'; $params[':phone'] = $data['phone'] ?: null; }
+            if (array_key_exists('address', $data)) { $fields[] = 'address = :address'; $params[':address'] = $data['address'] ?: null; }
+            if (array_key_exists('gender', $data)) { $fields[] = 'gender = :gender'; $params[':gender'] = substr((string)$data['gender'], 0, 20) ?: null; }
 
             // Handle avatar upload
-            $newAvatar = $oldAvatar;
+            $avatarUploaded = false;
             if (!empty($avatarFile) && isset($avatarFile['tmp_name']) && $avatarFile['size'] > 0) {
                 $uploaded = $this->handleAvatarUpload($avatarFile);
                 if ($uploaded === false) {
-                    return false;
+                    return ['error' => 'Avatar upload failed. Check file size and format (JPEG, PNG, WebP, GIF)'];
                 }
-                $newAvatar = $uploaded;
                 $fields[] = 'avata = :avata';
-                $params[':avata'] = $newAvatar;
+                $params[':avata'] = $uploaded;
+                $avatarUploaded = true;
             }
 
             if (empty($fields)) return true; // nothing to update
@@ -317,19 +339,21 @@ class Users_class {
             $sql = "UPDATE users SET " . implode(', ', $fields) . " WHERE user_id = :user_id";
             $stmt = $connection->prepare($sql);
             foreach ($params as $k => $v) {
-                $stmt->bindValue($k, $v, PDO::PARAM_STR);
+                $stmt->bindValue($k, $v, is_int($v) ? PDO::PARAM_INT : PDO::PARAM_STR);
             }
 
             $result = $stmt->execute();
-            if ($result && isset($uploaded) && $uploaded && $oldAvatar) {
-                // delete old avatar
+            
+            // Delete old avatar if new one was uploaded
+            if ($result && $avatarUploaded && $oldAvatar) {
                 $this->deleteAvatarFile($oldAvatar);
             }
+            
             return $result;
 
         } catch (PDOException $e) {
             error_log("Error Updating User: " . $e->getMessage());
-            return false;
+            return ['error' => 'Database error: ' . $e->getMessage()];
         }
     }
 

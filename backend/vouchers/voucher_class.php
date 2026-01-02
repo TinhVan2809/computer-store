@@ -10,7 +10,7 @@
                 $db = Database::getInstance();
                  $connection = $db->getConnection();
 
-                $sql = "SELECT * FROM vouchers";
+                $sql = "SELECT * FROM vouchers LIMIT :limit OFFSET :offset";
                 $stmt = $connection->prepare($sql);
                 $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
                 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
@@ -22,6 +22,22 @@
                 return [];
             }
         }
+
+    public function getCountVouchers()
+    {
+        try {
+            $db = Database::getInstance();
+            $connection = $db->getConnection();
+            $sql = "SELECT COUNT(*) AS total_vouchers FROM vouchers";
+            $count = $connection->prepare($sql);
+            $count->execute();
+            $row = $count->fetch(PDO::FETCH_ASSOC);
+            return isset($row['total_vouchers']) ? (int)$row['total_vouchers'] : 0;
+        } catch (PDOException $e) {
+            error_log("Error counting vouchers", $e->getMessage());
+            return [];
+        }
+    }
     }
 
 ?>

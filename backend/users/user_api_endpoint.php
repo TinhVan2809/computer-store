@@ -141,8 +141,12 @@ try {
                 }
 
                 $avatarFile = $_FILES['avata'] ?? ($_FILES['avatar'] ?? null);
-                $ok = $userObj->updateUser($user_id, $data, $avatarFile);
-                if ($ok) {
+                $result = $userObj->updateUser($user_id, $data, $avatarFile);
+                
+                if (is_array($result) && isset($result['error'])) {
+                    sendJson(['success' => false, 'message' => $result['error']], 400);
+                }
+                if ($result === true) {
                     sendJson(['success' => true]);
                 }
                 sendJson(['success' => false, 'message' => 'Failed to update user'], 500);

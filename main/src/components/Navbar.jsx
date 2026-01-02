@@ -1,6 +1,10 @@
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link , useNavigate} from "react-router-dom";
+import UserContext from "../context/AdminContext";
+import { useContext } from "react";
 import '../styles/navbar.css'
 function Navbar() {
+    const navigate = useNavigate();
+    const { logout, currentUser } = useContext(UserContext);
     return (
         <>
             <header className="navbar-container">
@@ -14,8 +18,8 @@ function Navbar() {
                     </ul>
                 </nav>
                 <div className="user-logout">
-                    <Link><i class="ri-user-line"></i></Link>
-                    <button>Logout</button>
+                    <Link><i className="ri-user-line"></i></Link>
+                    <button onClick={logout}>Logout</button>
                 </div>
             </header>
         </>

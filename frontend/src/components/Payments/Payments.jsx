@@ -1,12 +1,14 @@
 import { useContext, useEffect, useState, useCallback } from "react";
-import { data, useLocation, useNavigate } from "react-router-dom";
+import {useLocation, useNavigate } from "react-router-dom";
 import UserContext from "../../context/UserContext";
 
 import "../../styles/payment.css";
 
 const API_ADDRESSES =
   "http://localhost/computer-store/backend/addresses/address_api_endpoint.php";
-const LIMIT = 5;
+const LIMIT = 10;
+
+const API_VOUCHERS =  "http://localhost/computer-store/backend/vouchers/voucher_api_endpoint.php";
 const API = "http://localhost:3000";
 
 function Payments() {
@@ -18,8 +20,8 @@ function Payments() {
 
   const [addresses, setAddresses] = useState([]);
 
-  const [currentPage, setCurrentPage] = useState(0);
-  const [totalCount, setTotalCount] = useState(0);
+  const [addressCurrentPage, setAddressCurrentPage] = useState(0);
+  const [addressTotalCount, setAddressTotalCount] = useState(0);
 
   // Biến show form thêm địa chỉ
   const [showFormAddress, setShowAddressForm] = useState(false);
@@ -31,6 +33,11 @@ function Payments() {
   const [wards, setWards] = useState([]);
   const [selectedProvince, setSelectedProvince] = useState(null);
   const [selectedDistrict, setSelectedDistrict] = useState(null);
+
+  //Vouchers
+  const [vouchers, setVouchers] = useState([]);
+  const [voucherCurrentPage, setVoucherCurrentPage] = useState(1);
+  const [voucherTotalPages, setVoucherTotalPages] = useState(0);
 
   
 
@@ -68,6 +75,7 @@ function Payments() {
     currency: "USD",
   });
 
+  // Fetch lấy danh sách địa chỉ
   const fetchAddressesData = useCallback(
     async (page = 0) => {
       try {
@@ -81,10 +89,11 @@ function Payments() {
           }&limit=${LIMIT}&user_id=${userId}`
         );
         const data = await response.json();
+
         if (data.success) {
           setAddresses(data.data);
-          setTotalCount(data.total_items);
-          setCurrentPage(page);
+          setAddressTotalCount(data.total_items);
+          setAddressCurrentPage(page);
         }
       } catch (err) {
         console.error("error fetching Addresses", err);
@@ -94,8 +103,9 @@ function Payments() {
   );
 
   useEffect(() => {
-    fetchAddressesData(); //eslint-disable-line
-  }, [fetchAddressesData]);
+    fetchAddressesData(addressCurrentPage);
+    fetchVouchersData(voucherCurrentPage);
+  }, [fetchAddressesData, addressCurrentPage, voucherCurrentPage]);
 
   // Nếu không có sản phẩm nào được truyền qua, điều hướng về trang chủ
   if (!items || items.length === 0) {
@@ -130,6 +140,26 @@ function Payments() {
   };
   //----------------------------------
 
+  // Fetch danh sách voucher
+  const fetchVouchersData = async (page = 1) => {
+    try{
+      const response = await fetch(`${API_VOUCHERS}?action=get&page=${page}&limit=${LIMIT}`);
+      if(!response.ok) {
+        throw new Error("Lỗi HTTP: ", response.status);
+      }
+
+      const data = await response.json();
+
+      if(data.success) {
+        setVouchers(data.data);
+        setVoucherTotalPages(data.total_pages);
+        setVoucherCurrentPage(data.current_page);
+      }
+
+    } catch(error) {
+      console.error("Lỗi khi fetch danh sách vouchers", error);
+    }
+  }
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -220,7 +250,7 @@ function Payments() {
       if (data.success) {
         alert("Thêm địa chỉ mới thành công!");
         setShowAddressForm(false);
-        fetchAddressesData(currentPage); // Refresh the address list
+        fetchAddressesData(addressCurrentPage); // Refresh the address list
         setNewAddress({ // Reset form
           recipient_name: "",
           phone: "",
@@ -329,6 +359,30 @@ function Payments() {
                 </button>
               )}
             </div>
+
+            {/* Vouchers Section */}
+            {/* <div className="mt-6">
+              <div className="mt-4 flex justify-between">
+                {voucherCurrentPage > 1 && (
+                  <button
+                    onClick={() => setVoucherCurrentPage(voucherCurrentPage - 1)}
+                    className="px-4 py-2 bg-gray-300 rounded"
+                  >
+                    Previous
+                  </button>
+                )}
+                <span>Page {voucherCurrentPage} of {voucherTotalPages}</span>
+                {voucherCurrentPage < voucherTotalPages && (
+                  <button
+                    onClick={() => setVoucherCurrentPage(voucherCurrentPage + 1)}
+                    className="px-4 py-2 bg-gray-300 rounded"
+                  >
+                    Next
+                  </button>
+                )}
+              </div>
+            </div> */}
+
           </div>
         </div>
       </div>

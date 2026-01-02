@@ -24,6 +24,7 @@ function Navbar() {
               className="w-8 h-8 md:w-10 md:h-10 object-cover rounded-[50%]"
               src="/images/logo.png"
               alt="logo"
+              onClick={() => navigate('/')}
             />
           </div>
 
