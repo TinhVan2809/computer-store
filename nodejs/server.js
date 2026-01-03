@@ -77,7 +77,7 @@ app.post("/login", (req, res) => {
 
             // check password
             const isMatch = bcrypt.compareSync(password, user.password);
-            if(!isMatch) return res.status(400).json({ message: "Invalid password"});
+            if(!isMatch) return res.status(400).json({ message: "Invalid password! Check your password of contact Administrator."});
                         
             //created token
             const token = jwt.sign(

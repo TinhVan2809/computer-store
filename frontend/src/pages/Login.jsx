@@ -64,6 +64,11 @@ function Login() {
                                 <input className='w-full py-2.5 outline-0' type={passwordVisible ? "text" : "password"} placeholder='Password' id='password' name='password' value={password} onChange={(e) => setPassword(e.target.value)} required/>
                                 <i className={passwordVisible ? "cursor-pointer ri-eye-fill" : "cursor-pointer ri-eye-off-fill"} id='showPassword' onClick={togglePasswordVisibility}></i>
                             </div>
+                            {error && (
+                            <div className="bg-red-100 p-1">
+                                <p className='text-red-400 text-sm'>{error}</p>
+                            </div>
+                            )}
                         </div>
                         <div className="flex w-[400px] justify-between mt-2">
                             <div className="flex justify-center items-center gap-1">
@@ -105,16 +110,6 @@ function Login() {
                     </div>
                     
                 </form> 
-               {error && ( 
-                    <>
-                        <p>{error}</p>
-                    </>
-               )}
-               {message && (
-                <>
-                    <p>{message}</p>
-                </>
-               )}
             </div>
         </>
     );
