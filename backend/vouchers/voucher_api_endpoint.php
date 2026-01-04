@@ -75,6 +75,75 @@ function sendJson($payload, int $status = 200) {
             ]);
             break;
 
+        case 'delete':
+            $voucher_id = filter_input(INPUT_POST, 'voucher_id', FILTER_VALIDATE_INT);
+            
+            if (!$voucher_id) {
+                sendJson(['success' => false, 'message' => 'Invalid voucher ID'], 400);
+            }
+
+            $result = $vouchersObj->deleteVoucher($voucher_id);
+            
+            if ($result) {
+                sendJson(['success' => true, 'message' => 'Xóa voucher thành công']);
+            } else {
+                sendJson(['success' => false, 'message' => 'Không thể xóa voucher'], 400);
+            }
+            break;
+
+            case 'detail':
+                $voucher_id = filter_input(INPUT_POST, 'voucher_id', FILTER_VALIDATE_INT);
+
+                if(!$voucher_id) {
+                    sendJson(['success' => false, 'message' => "Invalid voucher Id"], 400);
+                }
+                $data = $vouchersObj->getVoucherById($voucher_id);
+
+                if($data) {
+                    sendJson([
+                    'success' => true,
+                    'data' => $data,                  
+                    ]);
+                } else {
+                    sendJson(['success' => false, 'message' => 'Không thể lấy voucher theo ID'], 400);
+                }
+
+                break;
+
+        case 'update':
+            $voucher_id = filter_input(INPUT_POST, 'voucher_id', FILTER_VALIDATE_INT);
+            
+            if (!$voucher_id) {
+                sendJson(['success' => false, 'message' => 'Invalid voucher ID'], 400);
+            }
+
+            $voucher_name = filter_input(INPUT_POST, 'voucher_name', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $sale = filter_input(INPUT_POST, 'sale', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $min_total_amount = filter_input(INPUT_POST, 'min_total_amount', FILTER_VALIDATE_INT);
+            $start_at = filter_input(INPUT_POST, 'start_at', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $end_at = filter_input(INPUT_POST, 'end_at', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+
+            if (!$voucher_name || !$sale || $min_total_amount === null || !$start_at || !$end_at) {
+                sendJson(['success' => false, 'message' => 'Missing or invalid required fields'], 400);
+            }
+
+            $data = [
+                'voucher_name' => $voucher_name,
+                'sale' => $sale,
+                'min_total_amount' => $min_total_amount,
+                'start_at' => $start_at,
+                'end_at' => $end_at
+            ];
+
+            $result = $vouchersObj->updateVoucher($voucher_id, $data);
+            
+            if ($result) {
+                sendJson(['success' => true, 'message' => 'Cập nhật voucher thành công']);
+            } else {
+                sendJson(['success' => false, 'message' => 'Không thể cập nhật voucher'], 400);
+            }
+            break;
+
          default:
             sendJson(['success' => false, 'message' => 'Invalid action: ' . htmlspecialchars($action)], 400);
             break;

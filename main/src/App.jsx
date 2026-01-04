@@ -11,6 +11,8 @@ import Users from './pages/Users';
 import Categories from './pages/Categories';
 import Login from './pages/Login';
 import AdminLogin from './pages/AdminLogin';
+import Voucher from './pages/Voucher';
+
 
 
 function App() {  
@@ -27,6 +29,7 @@ function App() {
             <Route path='/categories' element={<Categories />} />
             <Route path='/login' element={<Login />} />
             <Route path="/admin-login" element={<AdminLogin />} />
+            <Route path="/vouchers" element={<Voucher />} /> 
           </Routes>
         </UserProvider>
       </BrowserRouter>

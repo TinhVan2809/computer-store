@@ -58,7 +58,7 @@
     border-radius: 5px;
 }
 
-button[type="submit"] {
+.admin-login-container button[type="submit"] {
     width: 100%;
     padding: 12px;
     background-color: #667eea;
@@ -71,11 +71,11 @@ button[type="submit"] {
     transition: background-color 0.3s ease;
 }
 
-button[type="submit"]:hover:not(:disabled) {
+.admin-login-container button[type="submit"]:hover:not(:disabled) {
     background-color: #5568d3;
 }
 
-button[type="submit"]:disabled {
+.admin-login-container button[type="submit"]:disabled {
     background-color: #ccc;
     cursor: not-allowed;
 }
