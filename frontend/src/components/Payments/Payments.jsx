@@ -1,58 +1,26 @@
 import { useContext, useEffect, useState, useCallback } from "react";
-import {useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import UserContext from "../../context/UserContext";
-
+import API from "../../api/api";
 import "../../styles/payment.css";
 
-const API_ADDRESSES =
-  "http://localhost/computer-store/backend/addresses/address_api_endpoint.php";
+const API_VOUCHERS = "http://localhost/computer-store/backend/vouchers/voucher_api_endpoint.php";
 const LIMIT = 10;
-
-const API_VOUCHERS =  "http://localhost/computer-store/backend/vouchers/voucher_api_endpoint.php";
-const API = "http://localhost:3000";
 
 function Payments() {
   const location = useLocation();
   const navigate = useNavigate();
-
   const { currentUser } = useContext(UserContext);
   const userId = currentUser?.id;
 
+  // State quản lý địa chỉ
   const [addresses, setAddresses] = useState([]);
-
-  const [addressCurrentPage, setAddressCurrentPage] = useState(0);
-  const [addressTotalCount, setAddressTotalCount] = useState(0);
-
-  // Biến show form thêm địa chỉ
-  const [showFormAddress, setShowAddressForm] = useState(false);
-  // Biến show danh sách các địa chỉ có trong danh sách của người dùng
+  const [selectedAddress, setSelectedAddress] = useState(null);
+  const [showFormAddress, setShowFormAddress] = useState(false);
   const [addressList, setAddressList] = useState(false);
+  const [addressCurrentPage, setAddressCurrentPage] = useState(0);
 
-  const [provinces, setProvinces] = useState([]);
-  const [districts, setDistricts] = useState([]);
-  const [wards, setWards] = useState([]);
-  const [selectedProvince, setSelectedProvince] = useState(null);
-  const [selectedDistrict, setSelectedDistrict] = useState(null);
-
-  //Vouchers
-  const [vouchers, setVouchers] = useState([]);
-  const [voucherCurrentPage, setVoucherCurrentPage] = useState(1);
-  const [voucherTotalPages, setVoucherTotalPages] = useState(0);
-
-  
-
-  // Hàm show danh sách địa chỉ
-  const onAddressList = () => {
-    setAddressList(true);
-    setShowAddressForm(false);
-  }
-  // Hàm đóng danh sách địa chỉ
-  const onCloseAddressList = () => {
-    setAddressList(false);
-  }
-
-
-  // show form thêm địa chỉ mới
+  // State quản lý form địa chỉ mới
   const [newAddress, setNewAddress] = useState({
     recipient_name: "",
     phone: "",
@@ -67,127 +35,123 @@ function Payments() {
     is_default: 0,
   });
 
-  // Nhận dữ liệu được truyền từ trang giỏ hàng
+  // State quản lý địa điểm (tỉnh, huyện, phường)
+  const [provinces, setProvinces] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [wards, setWards] = useState([]);
+  const [selectedProvince, setSelectedProvince] = useState(null);
+  const [selectedDistrict, setSelectedDistrict] = useState(null);
+
+  // State quản lý voucher
+  const [vouchers, setVouchers] = useState([]);
+  const [selectedVoucher, setSelectedVoucher] = useState(null);
+  const [voucherCurrentPage, setVoucherCurrentPage] = useState(1);
+
+  // State quản lý shipping voucher
+  const [shippingVouchers, setShippingVouchers] = useState([]);
+  const [selectedShippingVoucher, setSelectedShippingVoucher] = useState(null);
+
+  // State quản lý thanh toán
+  const [paymentMethod, setPaymentMethod] = useState("cod");
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  // Lấy dữ liệu từ trang giỏ hàng
   const { items, totalPrice } = location.state || {};
 
+  // Format tiền tệ
   const formatter = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
   });
 
-  // Fetch lấy danh sách địa chỉ
+  // ============ QUẢN LÝ ĐỊA CHỈ ============
+
   const fetchAddressesData = useCallback(
     async (page = 0) => {
+      if (!userId) return;
       try {
-        if (!userId) {
-          return;
+        const response = await API.get("/addresses", {
+          params: {
+            page: page + 1,
+            limit: LIMIT,
+          },
+        });
+        const addressList = response.data.data || [];
+        setAddresses(addressList);
+        // Tự động chọn địa chỉ mặc định hoặc đầu tiên
+        const defaultAddr = addressList.find((addr) => addr.is_default === 1);
+        if (defaultAddr) {
+          setSelectedAddress(defaultAddr);
+        } else if (addressList.length > 0) {
+          setSelectedAddress(addressList[0]);
         }
-
-        const response = await fetch(
-          `${API_ADDRESSES}?action=get&page=${
-            page + 1
-          }&limit=${LIMIT}&user_id=${userId}`
-        );
-        const data = await response.json();
-
-        if (data.success) {
-          setAddresses(data.data);
-          setAddressTotalCount(data.total_items);
-          setAddressCurrentPage(page);
-        }
-      } catch (err) {
-        console.error("error fetching Addresses", err);
+      } catch (error) {
+        console.error("Error fetching addresses:", error);
       }
     },
     [userId]
   );
 
   useEffect(() => {
-    fetchAddressesData(addressCurrentPage);
-    fetchVouchersData(voucherCurrentPage);
-  }, [fetchAddressesData, addressCurrentPage, voucherCurrentPage]);
+    if (userId) {
+      fetchAddressesData(addressCurrentPage);
+      fetchVouchersData(voucherCurrentPage);
+      fetchProvinces();
+    }
+  }, [userId, fetchAddressesData, addressCurrentPage, voucherCurrentPage]);
 
-  // Nếu không có sản phẩm nào được truyền qua, điều hướng về trang chủ
+  // Kiểm tra nếu không có sản phẩm
   if (!items || items.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen">
-        <p className="text-xl">Không có sản phẩm nào để thanh toán.</p>
-        <button
-          onClick={() => navigate("/")}
-          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
-          Quay về trang chủ
-        </button>
+      <div className="payment-empty">
+        <h2>Giỏ hàng trống</h2>
+        <button onClick={() => navigate("/products")}>Quay lại mua sắm</button>
       </div>
     );
   }
 
-  // Hàm đóng mở form thêm địa chỉ mới
-  const onAddressForm = async () => {
-    onCloseAddressList(false);
-    setShowAddressForm(true);
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewAddress({
+      ...newAddress,
+      [name]: value,
+    });
+  };
+
+  const fetchProvinces = async () => {
     try {
-      const response = await fetch(`${API}/api/provinces`);
+      const response = await fetch("http://localhost:3000/api/provinces");
       const data = await response.json();
-      setProvinces(data);
+      setProvinces(data.results || data);
     } catch (error) {
       console.error("Error fetching provinces:", error);
     }
   };
 
-  const onCancelAddressForm = async () => {
-    setShowAddressForm(false);
-  };
-  //----------------------------------
-
-  // Fetch danh sách voucher
-  const fetchVouchersData = async (page = 1) => {
-    try{
-      const response = await fetch(`${API_VOUCHERS}?action=get&page=${page}&limit=${LIMIT}`);
-      if(!response.ok) {
-        throw new Error("Lỗi HTTP: ", response.status);
-      }
-
-      const data = await response.json();
-
-      if(data.success) {
-        setVouchers(data.data);
-        setVoucherTotalPages(data.total_pages);
-        setVoucherCurrentPage(data.current_page);
-      }
-
-    } catch(error) {
-      console.error("Lỗi khi fetch danh sách vouchers", error);
-    }
-  }
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewAddress((prev) => ({ ...prev, [name]: value }));
-  };
-
   const handleProvinceChange = async (e) => {
     const provinceCode = e.target.value;
-    const provinceName = e.target.options[e.target.selectedIndex].text;
-    setSelectedProvince(provinceCode);
-    setNewAddress((prev) => ({
-      ...prev,
+    const province = provinces.find((p) => p.code === Number(provinceCode));
+
+    setSelectedProvince(province);
+    setNewAddress({
+      ...newAddress,
       province_id: provinceCode,
-      province_name: provinceName,
+      province_name: province?.name || "",
       district_id: "",
       district_name: "",
       ward_id: "",
       ward_name: "",
-    }));
+    });
     setDistricts([]);
     setWards([]);
-    if (provinceCode) {
+
+    if (province) {
       try {
         const response = await fetch(
-          `${API}/api/districts/${provinceCode}`
+          `http://localhost:3000/api/districts/${province.code}`
         );
         const data = await response.json();
-        setDistricts(data);
+        setDistricts(data || []);
       } catch (error) {
         console.error("Error fetching districts:", error);
       }
@@ -196,23 +160,25 @@ function Payments() {
 
   const handleDistrictChange = async (e) => {
     const districtCode = e.target.value;
-    const districtName = e.target.options[e.target.selectedIndex].text;
-    setSelectedDistrict(districtCode);
-    setNewAddress((prev) => ({
-      ...prev,
+    const district = districts.find((d) => d.code === Number(districtCode));
+
+    setSelectedDistrict(district);
+    setNewAddress({
+      ...newAddress,
       district_id: districtCode,
-      district_name: districtName,
+      district_name: district?.name || "",
       ward_id: "",
       ward_name: "",
-    }));
+    });
     setWards([]);
-    if (districtCode) {
+
+    if (district) {
       try {
         const response = await fetch(
-          `${API}/api/wards/${districtCode}`
+          `http://localhost:3000/api/wards/${district.code}`
         );
         const data = await response.json();
-        setWards(data);
+        setWards(data || []);
       } catch (error) {
         console.error("Error fetching wards:", error);
       }
@@ -221,37 +187,52 @@ function Payments() {
 
   const handleWardChange = (e) => {
     const wardCode = e.target.value;
-    const wardName = e.target.options[e.target.selectedIndex].text;
-    setNewAddress((prev) => ({
-      ...prev,
-      ward_id: wardCode,
-      ward_name: wardName,
-    }));
-  };
+    const ward = wards.find((w) => w.code === Number(wardCode));
 
-  const handleLabelChange = (label) => {
-    setNewAddress((prev) => ({ ...prev, label: label }));
+    setNewAddress({
+      ...newAddress,
+      ward_id: wardCode,
+      ward_name: ward?.name || "",
+    });
   };
 
   const handleAddAddress = async (e) => {
     e.preventDefault();
-    const url = `${API_ADDRESSES}?action=add&user_id=${userId}`;
+
+    if (
+      !newAddress.recipient_name ||
+      !newAddress.phone ||
+      !newAddress.province_id ||
+      !newAddress.district_id ||
+      !newAddress.ward_id ||
+      !newAddress.specific_address
+    ) {
+      alert("Vui lòng điền đầy đủ thông tin");
+      return;
+    }
+
     try {
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newAddress),
-      });
+      const addressPayload = {
+        recipient_name: newAddress.recipient_name,
+        phone: newAddress.phone,
+        province_id: Number(newAddress.province_id),
+        province_name: newAddress.province_name,
+        district_id: Number(newAddress.district_id),
+        district_name: newAddress.district_name,
+        ward_id: newAddress.ward_id,
+        ward_name: newAddress.ward_name,
+        specific_address: newAddress.specific_address,
+        label: newAddress.label,
+        is_default: Number(newAddress.is_default) || 0,
+      };
+      
+      const response = await API.post("/addresses", addressPayload);
 
-      const data = await response.json();
-
+      const data = response.data;
       if (data.success) {
-        alert("Thêm địa chỉ mới thành công!");
-        setShowAddressForm(false);
-        fetchAddressesData(addressCurrentPage); // Refresh the address list
-        setNewAddress({ // Reset form
+        alert("Thêm địa chỉ thành công");
+        setShowFormAddress(false);
+        setNewAddress({
           recipient_name: "",
           phone: "",
           province_id: "",
@@ -264,334 +245,464 @@ function Payments() {
           label: "Nhà riêng",
           is_default: 0,
         });
-         onAddressList(true); // quay lại danh sách địa chỉ khi thêm thành công.
+        fetchAddressesData(0);
       } else {
-        alert("Lỗi: " + data.message);
+        alert(data.message || "Lỗi khi thêm địa chỉ");
       }
     } catch (error) {
-      console.error("Lỗi khi thêm địa chỉ mới. ", error);
-      alert("Đã xảy ra lỗi. Vui lòng thử lại.");
+      console.error("Error adding address:", error);
+      alert("Lỗi khi thêm địa chỉ: " + (error.response?.data?.message || error.message));
     }
   };
- 
+
+  // ============ QUẢN LÝ VOUCHER ============
+
+  const fetchVouchersData = async (page = 1) => {
+    try {
+      const response = await fetch(
+        `${API_VOUCHERS}?action=get&page=${page}&limit=10`
+      );
+      const data = await response.json();
+      const productVouchers = (data.vouchers || data.data || []).filter(
+        (v) => !v.shipping_name
+      );
+      setVouchers(productVouchers);
+    } catch (error) {
+      console.error("Error fetching vouchers:", error);
+    }
+  };
+
+  // ============ XỬ LÝ THANH TOÁN ============
+
+  const calculateTotal = () => {
+   
+    // Tổng giá đã giảm giá sản phẩm (giá sau product_sale * quantity đã chọn)
+    const subtotal = items.reduce(
+      (sum, item) => {
+        const price = Number(item.product_price) || 0;
+        const sale = Number(item.product_sale) || 0;
+        const quantity = Number(item.quantity) || 0;
+        const saleClamped = Math.max(0, Math.min(100, sale));
+        return sum + (price * (1 - saleClamped / 100) * quantity);
+      },
+      0
+    );
+    let shippingFee = 5; // Phí vận chuyển cố định
+    let discount = 0; // Chỉ tính giảm thêm từ voucher
+    let shippingDiscount = 0;
+
+    // Áp dụng discount từ voucher sản phẩm (trên giá đã giảm)
+    if (selectedVoucher) {
+      const sale = Number(selectedVoucher.sale ?? 0);
+      if (!isNaN(sale) && sale > 0) {
+        discount = (subtotal * sale) / 100;
+      }
+    }
+
+    // Áp dụng discount từ shipping voucher
+    if (selectedShippingVoucher) {
+      shippingDiscount = (shippingFee * selectedShippingVoucher.sale) / 100;
+      shippingFee = shippingFee - shippingDiscount;
+    }
+
+    return {
+      subtotal: Number(subtotal).toFixed(2),
+      shippingFee: Number(shippingFee).toFixed(2),
+      discount: Number(discount).toFixed(2),
+      shippingDiscount: Number(shippingDiscount).toFixed(2),
+      total: (Number(subtotal) + Number(shippingFee) - Number(discount)).toFixed(2),
+    };
+  };
+
+  const handlePlaceOrder = async () => {
+    if (!selectedAddress) {
+      alert("Vui lòng chọn địa chỉ giao hàng");
+      return;
+    }
+
+    setIsProcessing(true);
+
+    try {
+      const { total, shippingFee } = calculateTotal();
+
+      // Chuẩn bị dữ liệu đơn hàng
+      const orderData = {
+        items: items.map((item) => ({
+          product_id: item.product_id,
+          product_name: item.product_name,
+          product_price: item.product_price,
+          // product_quantity: item.product_quantity,
+          product_sale: item.product_sale,
+          image_main: item.image_main,
+          category_id: item.category_id,
+          manufacturer_id: item.manufacturer_id,
+          quantity: item.quantity, // Số lượng đã chọn trong Cart.jsx
+          price: Number(item.product_price) * (1 - Number(item.product_sale || 0) / 100), // giá đã giảm
+        })),
+        totalAmount: total,
+        shippingFee: shippingFee,
+        voucherId: selectedVoucher?.voucher_id || null,
+        recipientName: selectedAddress.recipient_name,
+        recipientPhone: selectedAddress.phone,
+        provinceName: selectedAddress.province_name,
+        districtName: selectedAddress.district_name,
+        wardName: selectedAddress.ward_name,
+        specificAddress: selectedAddress.specific_address,
+        userAddressId: selectedAddress.address_id,
+      };
+
+      // Tạo đơn hàng
+      const orderResponse = await API.post("/orders", orderData);
+      const orderId = orderResponse.data.order_id;
+
+      // Xử lý thanh toán
+      if (paymentMethod === "cod") {
+        // Thanh toán khi nhận hàng
+        await API.post("/payments", {
+          order_id: orderId,
+          amount: total,
+          provider: "cod",
+          transaction_code: "COD_" + orderId,
+          status: "pending",
+        });
+
+        alert("Đặt hàng thành công! Vui lòng chờ xác nhận từ cửa hàng.");
+        navigate(`/orders/${orderId}`);
+      } else if (paymentMethod === "momo") {
+        handleMomoPayment(orderId, total);
+      } else if (paymentMethod === "vnpay") {
+        handleVNPayPayment(orderId, total);
+      }
+    } catch (error) {
+      console.error("Error placing order:", error);
+      alert(
+        "Lỗi khi đặt hàng: " + (error.response?.data?.error || error.message)
+      );
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleMomoPayment = (orderId, amount) => {
+    alert("Thanh toán Momo sẽ được tích hợp trong phiên bản tiếp theo");
+  };
+
+  const handleVNPayPayment = (orderId, amount) => {
+    alert("Thanh toán VNPay sẽ được tích hợp trong phiên bản tiếp theo");
+  };
+
+  const { subtotal, shippingFee, discount, total } = calculateTotal();
+
   return (
-    <>
-      <div className="container p-3">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Phần thông tin sản phẩm */}
-          <div>
-            <h2 className="text-2xl font-semibold mb-4">Sản phẩm đã chọn</h2>
-            <div className="space-y-4">
-              {items.map((item) => (
-                <div
-                  key={item.cart_id}
-                  className="flex items-center justify-between p-4 border rounded-lg"
+    <div className="payment-page">
+      <div className="payment-container">
+        {/* ========== PHẦN TRÁI: THÔNG TIN GIAO HÀNG ========== */}
+        <div className="payment-left">
+          <div className="section-box">
+            <h3 className="section-title">📍 Địa chỉ giao hàng</h3>
+
+            {selectedAddress && (
+              <div className="selected-address-box">
+                <p>
+                  <strong>{selectedAddress.recipient_name}</strong> |{" "}
+                  {selectedAddress.phone}
+                </p>
+                <p>
+                  {selectedAddress.specific_address},{" "}
+                  {selectedAddress.ward_name}, {selectedAddress.district_name},{" "}
+                  {selectedAddress.province_name}
+                </p>
+                <button
+                  className="change-btn"
+                  onClick={() => setAddressList(!addressList)}
                 >
-                  <div className="flex items-center">
-                    <img
-                      src={`http://localhost/computer-store/backend/uploads/products_img/${item.image_main}`}
-                      alt={item.product_name}
-                      className="w-16 h-16 object-cover rounded mr-4"
-                    />
-                    <div>
-                      <p className="font-semibold">{item.product_name}</p>
-                      <p className="text-sm text-gray-600">
-                        Số lượng: {item.quantity}
+                  {addressList ? "Ẩn danh sách" : "Thay đổi"}
+                </button>
+              </div>
+            )}
+
+            {addressList && (
+              <div className="address-list">
+                {addresses.length > 0 ? (
+                  addresses.map((addr) => (
+                    <div
+                      key={addr.address_id}
+                      className={`address-item ${
+                        selectedAddress?.address_id === addr.address_id
+                          ? "active"
+                          : ""
+                      }`}
+                      onClick={() => {
+                        setSelectedAddress(addr);
+                        setAddressList(false);
+                      }}
+                    >
+                      <p>
+                        <strong>{addr.recipient_name}</strong> | {addr.phone}
                       </p>
+                      <p>
+                        {addr.specific_address}, {addr.ward_name},{" "}
+                        {addr.district_name}, {addr.province_name}
+                      </p>
+                      <span className="label">{addr.label}</span>
                     </div>
-                  </div>
-                  <p className="font-semibold">
-                    {formatter.format(
-                      item.product_price *
-                        (1 - item.product_sale / 100) *
-                        item.quantity
-                    )}
-                  </p>
+                  ))
+                ) : (
+                  <p className="empty-text">Chưa có địa chỉ</p>
+                )}
+              </div>
+            )}
+
+            <button
+              className="add-address-btn"
+              onClick={() => setShowFormAddress(!showFormAddress)}
+            >
+              {showFormAddress ? "Ẩn form" : "+ Thêm địa chỉ mới"}
+            </button>
+
+            {showFormAddress && (
+              <form className="address-form" onSubmit={handleAddAddress}>
+                <div className="form-group">
+                  <label>Tên người nhận</label>
+                  <input
+                    type="text"
+                    name="recipient_name"
+                    value={newAddress.recipient_name}
+                    onChange={handleInputChange}
+                    required
+                  />
                 </div>
-              ))}
+
+                <div className="form-group">
+                  <label>Số điện thoại</label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={newAddress.phone}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Tỉnh/Thành phố</label>
+                  <select
+                    value={selectedProvince?.code || ""}
+                    onChange={handleProvinceChange}
+                    required
+                  >
+                    <option value="">Chọn tỉnh/thành phố</option>
+                    {provinces.map((prov) => (
+                      <option key={prov.code} value={prov.code}>
+                        {prov.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>Quận/Huyện</label>
+                  <select
+                    value={selectedDistrict?.code || ""}
+                    onChange={handleDistrictChange}
+                    required
+                  >
+                    <option value="">Chọn quận/huyện</option>
+                    {districts.map((dist) => (
+                      <option key={dist.code} value={dist.code}>
+                        {dist.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>Phường/Xã</label>
+                  <select
+                    value={newAddress.ward_id}
+                    onChange={handleWardChange}
+                    required
+                  >
+                    <option value="">Chọn phường/xã</option>
+                    {wards.map((ward) => (
+                      <option key={ward.code} value={ward.code}>
+                        {ward.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>Địa chỉ cụ thể</label>
+                  <textarea
+                    name="specific_address"
+                    value={newAddress.specific_address}
+                    onChange={handleInputChange}
+                    placeholder="Số nhà, tên đường..."
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Loại địa chỉ</label>
+                  <select
+                    name="label"
+                    value={newAddress.label}
+                    onChange={handleInputChange}
+                  >
+                    <option value="Nhà riêng">Nhà riêng</option>
+                    <option value="Văn phòng">Văn phòng</option>
+                    <option value="Khác">Khác</option>
+                  </select>
+                </div>
+
+                <button type="submit" className="submit-btn">
+                  Thêm địa chỉ
+                </button>
+              </form>
+            )}
+          </div>
+
+          {/* ========== PHƯƠNG THỨC THANH TOÁN ========== */}
+          <div className="section-box">
+            <h3 className="section-title">💳 Phương thức thanh toán</h3>
+            <div className="payment-methods">
+              <label>
+                <input
+                  type="radio"
+                  value="cod"
+                  checked={paymentMethod === "cod"}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                />
+                <span>💵 Thanh toán khi nhận hàng (COD)</span>
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  value="momo"
+                  checked={paymentMethod === "momo"}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                />
+                <span>📱 Momo</span>
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  value="vnpay"
+                  checked={paymentMethod === "vnpay"}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                />
+                <span>🏦 VNPay</span>
+              </label>
             </div>
-            <div className="mt-6 text-right">
-              <p className="text-2xl font-bold">
-                Tổng cộng: {formatter.format(totalPrice)}
-              </p>
+          </div>
+        </div>
+
+        {/* ========== PHẦN PHẢI: ĐƠN HÀNG & TỔNG TIỀN ========== */}
+        <div className="payment-right">
+          {/* SẢN PHẨM */}
+          <div className="section-box">
+            <h3 className="section-title">📦 Sản phẩm</h3>
+            <div className="order-items">
+              {items.map((item) => {
+                const price = Number(item.product_price) || 0;
+                const sale = Number(item.product_sale) || 0;
+                const quantity = Number(item.quantity) || 0;
+                const saleClamped = Math.max(0, Math.min(100, sale));
+                const discounted = (price * quantity) * (1 - saleClamped / 100);
+                const formatter = new Intl.NumberFormat("en-EN", {
+                  style: "currency",
+                  currency: "USD",
+                });
+                return (
+                  <div key={item.product_id} className="order-item">
+                    <div className="item-info">
+                      <p className="product-name">{item.product_name}</p>
+                      <p className="quantity">x{item.quantity}</p>
+                    </div>
+                    <p className="item-price">{formatter.format(discounted)}</p>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
-          {/* Phần thông tin thanh toán (Placeholder) */}
-          <div>
-            <h2 className="text-2xl font-semibold mb-4">
-              Thông tin giao hàng và thanh toán
-            </h2>
-            <div className="">
-              {addresses.length > 0 ? (
-                addresses.map((a) => (
-                  <div key={a.user_address_id} className="w-full">
-                    {a.is_default == 1 && (
-                      <div className="w-full flex gap-5 border border-gray-300 p-2 flex-col">
-                        <div className="flex gap-4 justify-start items-end">
-                          <h2>Địa chỉ nhận hàng</h2>
-                          <a
-                            href="javaScript:void(0)"
-                            className="text-sm underline "
-                            onClick={onAddressList}
-                          >
-                            Chọn địa chỉ
-                          </a>
-                        </div>
-                        <div className="flex w-full gap-5">
-                          <p>{a.recipient_name}</p>
-                          <p>{a.phone}</p>
-                          <p>{a.province_name}</p>
-                          <p>{a.district_name}</p>
-                          <p>{a.ward_name}</p>
-                          <p>{a.specific_address}</p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ))
-              ) : (
+          {/* VOUCHER */}
+          <div className="section-box">
+            <h3 className="section-title">🎁 Voucher</h3>
+            {selectedVoucher ? (
+              <div className="selected-voucher">
+                <p>
+                  <strong>{selectedVoucher.voucher_name}</strong> - {" "}
+                  {selectedVoucher.sale}%
+                </p>
                 <button
-                  className="bg-black text-white p-2 text-sm rounded-sm cursor-pointer hover:opacity-80"
-                  onClick={onAddressForm}
+                  className="remove-voucher-btn"
+                  onClick={() => setSelectedVoucher(null)}
                 >
-                  <i className="ri-add-large-line"></i> Thêm địa chỉ
+                  Xóa
                 </button>
-              )}
+              </div>
+            ) : (
+              <div className="voucher-list">
+                {vouchers.map((voucher) => (
+                  <div
+                    key={voucher.voucher_id}
+                    className="voucher-item"
+                    onClick={e => {
+                      e.preventDefault();
+                      setSelectedVoucher(voucher);
+                    }}
+                  >
+                    <p className="voucher-code">{voucher.voucher_name}</p>
+                    <p className="voucher-discount">
+                      -{voucher.sale} %
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* TỔNG TIỀN */}
+          <div className="section-box summary-box">
+            <h3 className="section-title">💰 Tóm tắt</h3>
+            <div className="summary-item">
+              <span>Tạm tính:</span>
+              <span>{formatter.format(subtotal)}</span>
+            </div>
+            <div className="summary-item">
+              <span>Phí vận chuyển:</span>
+              <span>+{formatter.format(shippingFee)}</span>
+            </div>
+            {selectedVoucher && (
+              <>
+                <div className="summary-item discount">
+                <span>Voucher:</span>
+                <span>-{formatter.format(discount)}</span>
+              </div>
+              <div className="summary-item">
+                <span>Tạm tính sau giảm giá:</span>
+                <span>{formatter.format(subtotal - discount)}</span>
+              </div>
+              </>
+            )}
+            <div className="summary-item total">
+              <span>Tổng cộng:</span>
+              <span>{formatter.format(total)}</span>
             </div>
 
-            {/* Vouchers Section */}
-            {/* <div className="mt-6">
-              <div className="mt-4 flex justify-between">
-                {voucherCurrentPage > 1 && (
-                  <button
-                    onClick={() => setVoucherCurrentPage(voucherCurrentPage - 1)}
-                    className="px-4 py-2 bg-gray-300 rounded"
-                  >
-                    Previous
-                  </button>
-                )}
-                <span>Page {voucherCurrentPage} of {voucherTotalPages}</span>
-                {voucherCurrentPage < voucherTotalPages && (
-                  <button
-                    onClick={() => setVoucherCurrentPage(voucherCurrentPage + 1)}
-                    className="px-4 py-2 bg-gray-300 rounded"
-                  >
-                    Next
-                  </button>
-                )}
-              </div>
-            </div> */}
-
+            <button
+              className="place-order-btn"
+              onClick={handlePlaceOrder}
+              disabled={!selectedAddress || isProcessing}
+            >
+              {isProcessing ? "Đang xử lý..." : "Đặt hàng"}
+            </button>
           </div>
         </div>
       </div>
-
-      {/* Form thêm địa chỉ mới */}
-      {showFormAddress && (
-        <div className="addressForm fixed z-200 w-full top-0 h-full flex justify-center items-center">
-          <form
-            onSubmit={handleAddAddress}
-            className="flex flex-col bg-white p-4 gap-5"
-          >
-            <div className="flex gap-5">
-              <input
-                className="w-70 border border-gray-200 px-4 py-2"
-                type="text"
-                required
-                name="recipient_name"
-                placeholder="Tên người nhận"
-                value={newAddress.recipient_name}
-                onChange={handleInputChange}
-              />
-
-              <input
-                className="w-70 border border-gray-200 px-4 py-2"
-                type="text"
-                required
-                name="phone"
-                placeholder="Số điện thoại"
-                value={newAddress.phone}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <div className="flex gap-5">
-              <select
-                className="w-70 border border-gray-200 px-4 py-2"
-                required
-                onChange={handleProvinceChange}
-                value={newAddress.province_id}
-              >
-                <option value="">Chọn Tỉnh/Thành phố</option>
-                {provinces.map((p) => (
-                  <option key={p.code} value={p.code}>
-                    {p.name}
-                  </option>
-                ))}
-              </select>
-
-              <select
-                className="w-70 border border-gray-200 px-4 py-2"
-                required
-                onChange={handleDistrictChange}
-                value={newAddress.district_id}
-                disabled={!districts.length}
-              >
-                <option value="">Chọn Quận/Huyện</option>
-                {districts.map((d) => (
-                  <option key={d.code} value={d.code}>
-                    {d.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="flex gap-5">
-              <select
-                className="w-70 border border-gray-200 px-4 py-2"
-                required
-                onChange={handleWardChange}
-                value={newAddress.ward_id}
-                disabled={!wards.length}
-              >
-                <option value="">Chọn Phường/Xã</option>
-                {wards.map((w) => (
-                  <option key={w.code} value={w.code}>
-                    {w.name}
-                  </option>
-                ))}
-              </select>
-
-              <input
-                className="w-full border border-gray-200 px-4 py-2"
-                type="text"
-                required
-                name="specific_address"
-                placeholder="Số đường, số nhà, kdc,..."
-                value={newAddress.specific_address}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <div
-              className="UIG4fr"
-              role="radiogroup"
-              aria-label="Loại địa chỉ:"
-            >
-              <div
-                className={`uSUvOh ${
-                  newAddress.label === "Nhà riêng" ? "PdLW1O" : ""
-                }`}
-                role="radio"
-                aria-checked={newAddress.label === "Nhà riêng"}
-                onClick={() => handleLabelChange("Nhà riêng")}
-              >
-                <span className="Xge0vM">Nhà Riêng</span>
-              </div>
-              <div
-                className={`uSUvOh ${
-                  newAddress.label === "Công ty" ? "PdLW1O" : ""
-                }`}
-                role="radio"
-                aria-checked={newAddress.label === "Công ty"}
-                onClick={() => handleLabelChange("Công ty")}
-              >
-                <span className="Xge0vM">Công ty</span>
-              </div>
-            </div>
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="is_default"
-                name="is_default"
-                checked={newAddress.is_default === 1}
-                onChange={(e) =>
-                  setNewAddress((prev) => ({
-                    ...prev,
-                    is_default: e.target.checked ? 1 : 0,
-                  }))
-                }
-              />
-              <label htmlFor="is_default" className="ml-2">
-                Đặt làm địa chỉ mặc định
-              </label>
-            </div>
-
-            <div className="flex justify-end items-center gap-5">
-              <button
-                type="button"
-                className="px-3 py-1 border border-gray-200 cursor-pointer hover:opacity-70"
-                onClick={onCancelAddressForm}
-              >
-                Hủy
-              </button>
-              <button className="px-3 py-1 border border-gray-200 cursor-pointer hover:opacity-70" onClick={onAddressList}>
-                Đã có
-              </button>
-              <button
-                type="submit"
-                className="px-3 py-1 border border-gray-200 cursor-pointer hover:opacity-70 bg-stone-800 text-white"
-              >
-                Thêm
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      {/* Danh sách các địa chỉ hiện có */}
-      {addressList && (
-        <div className="addressForm fixed z-200 w-full top-0 h-full flex justify-center items-center">
-          <div className="bg-white p-7 flex flex-col justify-center gap-5 relative w-fit h-fit overflow-auto">
-            <button
-              className="bg-black text-white p-2 text-sm right-5 bottom-5 cursor-pointer absolute hover:opacity-80"
-              onClick={onAddressForm}
-            >
-              <i className="ri-add-large-line"></i> Thêm mới
-            </button>
-            {addresses.map((a) => (
-              <>
-                <div className="bg-gray-100 w-150 p-2 rounded-sm flex flex-col duration-200 cursor-pointer hover:bg-gray-300" key={a.user_address_id}>
-                  <p>
-                    <span className="text-gray-500">Tên người nhận: </span>
-                    {a.recipient_name}
-                  </p>
-                  <p>
-                    <span className="text-gray-500">Số điện thoại: </span>
-                    {a.phone}
-                  </p>
-                  <p>
-                    <span className="text-gray-500">Tỉnh/Thành phố: </span>
-                    {a.province_name}
-                  </p>
-                  <p>
-                    <span className="text-gray-500">Quận/Huyện: </span>
-                    {a.district_name}
-                  </p>
-                  <p>
-                    <span className="text-gray-500">Phường/Xã: </span>
-                    {a.ward_name}
-                  </p>
-                  <p>
-                    <span className="text-gray-500">
-                      Số đường, kdc, số nhà:{" "}
-                    </span>
-                    {a.specific_address}
-                  </p>
-                </div>
-              </>
-            ))}
-            <div
-              className="absolute -top-2 right-1 text-4xl cursor-pointer hover:opacity-70"
-              onClick={onCloseAddressList}
-            >
-              &times;
-            </div>
-          </div>
-        </div>
-      )}
-    </>
+    </div>
   );
 }
 

@@ -59,6 +59,28 @@ require_once '../connect.php';
             return 0;
         }
     }
+
+    public function deleteNotification(int $notification_id) {
+        if(!$notification_id) {
+            return false;
+        }
+        try{
+            $db = Database::getInstace();
+            $connection = $db->getConnection();
+
+            $sql = "DELETE FROM notifications WHERE notification_id = :notification_id";
+            $stmt = $connection->prepare($sql);
+            $stmt->bindValue(':notification_id', $notification_id, PDO::PARAM_INT);
+            $stmt->execute();
+            
+            return $stmt->rowCount() > 0;
+
+        } catch(PDOException $e) {
+            error_log("Error deletig notification " . $e->getMessage());
+            return [];
+        }
+    }
+
     }
 
 ?>

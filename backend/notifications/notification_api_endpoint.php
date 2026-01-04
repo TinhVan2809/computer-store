@@ -91,6 +91,22 @@ function sendJson($payload, int $status = 200) {
             ]);
             break;
 
+            case 'delete':
+                 $notification_id = filter_input(INPUT_POST, 'notification_id', FILTER_VALIDATE_INT);
+            
+                if (!$notification_id) {
+                    sendJson(['success' => false, 'message' => 'Invalid notification ID'], 400);
+                }
+
+                $result = $notification->deleteNotification($notification_id);
+                
+                if ($result) {
+                    sendJson(['success' => true, 'message' => 'Xóa thông báo thành công']);
+                } else {
+                    sendJson(['success' => false, 'message' => 'Không thể xóa thông báo'], 400);
+                }
+            break;
+
             default:
             sendJson(['success' => false, 'message' => 'Invalid action: ' . htmlspecialchars($action)], 400);
             break;

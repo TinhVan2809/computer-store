@@ -1,0 +1,226 @@
+@import 'tailwindcss';
+
+/* ============ DESKTOP (1200px+) ============ */
+@media (min-width: 1200px) {
+  .footer-container {
+    padding: 40px 40px;
+    gap: 75px;
+  }
+
+  .footer-header {
+    flex-direction: row;
+  }
+
+  .footer-header nav {
+    gap: 30px;
+  }
+
+  .footer-header ul li {
+    font-size: 14px;
+  }
+}
+
+/* ============ LAPTOP NHỎ (1024px - 1199px) ============ */
+@media (min-width: 1024px) and (max-width: 1199px) {
+  .footer-container {
+    padding: 35px 40px;
+    gap: 60px;
+  }
+
+  .footer-header {
+    flex-direction: row;
+  }
+
+  .footer-header nav {
+    gap: 25px;
+  }
+
+  .footer-header ul li {
+    font-size: 13px;
+  }
+
+  .footer-header section h2 {
+    font-size: 20px;
+  }
+
+  .footer-header section span {
+    font-size: 12px;
+  }
+}
+
+/* ============ TABLET NGANG (768px - 1023px) ============ */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .footer-container {
+    padding: 30px 30px;
+    gap: 50px;
+  }
+
+  .footer-header {
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .footer-header nav {
+    gap: 20px;
+    width: 100%;
+  }
+
+  .footer-header nav ul {
+    flex: 1;
+  }
+
+  .footer-header ul li {
+    font-size: 12px;
+  }
+
+  .footer-header section h2 {
+    font-size: 18px;
+  }
+
+  .footer-header section span {
+    font-size: 12px;
+  }
+
+  .copy-right {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+
+  .copy-right .items {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .copy-right button {
+    padding: 8px 12px;
+    font-size: 12px;
+    width: 100%;
+  }
+
+  .copy-right .items p {
+    font-size: 11px;
+  }
+}
+
+/* ============ MOBILE LANDSCAPE (576px - 767px) ============ */
+@media (min-width: 576px) and (max-width: 767px) {
+  .footer-container {
+    padding: 25px 20px;
+    gap: 40px;
+  }
+
+  .footer-header {
+    flex-direction: column;
+    gap: 25px;
+  }
+
+  .footer-header nav {
+    gap: 15px;
+    flex-direction: column;
+  }
+
+  .footer-header nav ul {
+    width: 100%;
+  }
+
+  .footer-header ul li {
+    font-size: 11px;
+  }
+
+  .footer-header section h2 {
+    font-size: 16px;
+  }
+
+  .footer-header section span {
+    font-size: 11px;
+  }
+
+  .footer-header ul li i {
+    display: none;
+  }
+
+  .copy-right {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+
+  .copy-right .items {
+    flex-direction: column;
+    gap: 5px;
+    align-items: center;
+  }
+
+  .copy-right button {
+    padding: 8px 12px;
+    font-size: 11px;
+    width: 100%;
+  }
+
+  .copy-right .items p {
+    font-size: 10px;
+  }
+}
+
+/* ============ MOBILE PORTRAIT (320px - 575px) ============ */
+@media (max-width: 575px) {
+  .footer-container {
+    padding: 20px 16px;
+    gap: 30px;
+  }
+
+  .footer-header {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .footer-header section h2 {
+    font-size: 16px;
+  }
+
+  .footer-header section span {
+    font-size: 11px;
+  }
+
+  .footer-header nav {
+    gap: 0;
+    flex-direction: column;
+  }
+
+  .footer-header nav ul {
+    width: 100%;
+    margin-bottom: 15px;
+  }
+
+  .footer-header nav ul li {
+    font-size: 10px;
+    padding: 5px 0;
+  }
+
+  .footer-header ul li i {
+    display: none;
+  }
+
+  .copy-right {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+
+  .copy-right .items {
+    flex-direction: column;
+    gap: 5px;
+    align-items: center;
+  }
+
+  .copy-right button {
+    padding: 8px 10px;
+    font-size: 10px;
+    width: 100%;
+  }
+
+  .copy-right .items p {
+    font-size: 10px;
+  }
+}

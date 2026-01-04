@@ -15,6 +15,8 @@ import Register from './pages/Register';
 import Profile from './pages/Profile';
 import Notifications from './pages/Notifications';
 import Payments from './components/Payments/Payments';
+import Orders from './pages/Orders';
+import OrderDetail from './pages/OrderDetail';
 
 
 //STYLES
@@ -37,6 +39,8 @@ function App() {
         <Route path='/profile/*' element={<Profile />} />
         <Route path='/notifications/:user_id' element={<Notifications />}/>
         <Route path="/payments" element={<Payments />} />
+        <Route path="/orders" element={<Orders />} />
+        <Route path="/orders/:orderId" element={<OrderDetail />} />
       </Routes>
 
   </>

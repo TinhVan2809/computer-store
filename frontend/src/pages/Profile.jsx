@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { NavLink, Route, Routes} from "react-router-dom";
+import { NavLink, Route, Routes, useNavigate} from "react-router-dom";
 import UserContext from "../context/UserContext";
 import '../styles/profile.css';
 
@@ -17,6 +17,8 @@ function Profile() {
     const [products, setProducts] = useState([]); //eslint-disable-line
     const [error, setError] = useState(''); //eslint-disable-line
     const [loading, setLoading] = useState(false); //eslint-disable-line
+
+    const navigate = useNavigate();
 
     const showConfirmLogout = () => {
         setIsClosing(false);
@@ -106,7 +108,7 @@ function Profile() {
               </div>
               <div className="">
                 <ul className="flex flex-col gap-2">
-                  <li className="cursor-pointer transition duration-300 hover:opacity-60">
+                  <li className="cursor-pointer transition duration-300 hover:opacity-60" onClick={() =>navigate('/orders')}>
                     Delivery address <i className="fa-regular fa-truck"></i>
                   </li>
                   <li className="cursor-pointer transition duration-300 hover:opacity-60">
