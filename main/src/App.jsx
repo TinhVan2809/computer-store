@@ -12,7 +12,8 @@ import Categories from './pages/Categories';
 import Login from './pages/Login';
 import AdminLogin from './pages/AdminLogin';
 import Voucher from './pages/Voucher';
-
+import OrderDetail from './pages/OrderDetail';
+import Orders from './pages/Orders';
 
 
 function App() {  
@@ -30,6 +31,8 @@ function App() {
             <Route path='/login' element={<Login />} />
             <Route path="/admin-login" element={<AdminLogin />} />
             <Route path="/vouchers" element={<Voucher />} /> 
+            <Route path="/orders" element={<Orders />} />
+            <Route path='order:orderId' element={<OrderDetail />} />
           </Routes>
         </UserProvider>
       </BrowserRouter>

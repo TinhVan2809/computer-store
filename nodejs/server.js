@@ -205,19 +205,52 @@ app.get("/orders", auth, (req, res) => {
 
             // Get orders with pagination
             db.query(
-                "SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?",
+                "SELECT o.*, p.* FROM orders o LEFT JOIN payments p ON o.order_id = p.order_id WHERE o.user_id = ? ORDER BY o.created_at DESC LIMIT ? OFFSET ?",
                 [userId, limit, offset],
                 (err, orders) => {
                     if (err) return res.status(500).json({ error: err.message });
 
-                    res.json({
-                        orders,
-                        pagination: {
-                            total,
-                            page,
-                            limit,
-                            pages: Math.ceil(total / limit)
-                        }
+                    if (orders.length === 0) {
+                        return res.json({
+                            orders: [],
+                            pagination: {
+                                total,
+                                page,
+                                limit,
+                                pages: Math.ceil(total / limit)
+                            }
+                        });
+                    }
+
+                    // For each order, fetch order-items with product details and images
+                    let completed = 0;
+                    const ordersWithDetails = [];
+
+                    orders.forEach((order, idx) => {
+                        db.query(
+                            "SELECT oi.*, p.* FROM order_items oi INNER JOIN products p ON p.product_id = oi.product_id WHERE oi.order_id = ?",
+                            [order.order_id],
+                            (err, items) => {
+                                if (err) {
+                                    ordersWithDetails[idx] = { ...order, items: [] };
+                                } else {
+                                    ordersWithDetails[idx] = { ...order, items };
+                                }
+                                completed++;
+
+                                if (completed === orders.length) {
+                                    res.json({
+                                        orders: ordersWithDetails,
+                                        pagination: {
+                                            total,
+                                            page,
+                                            limit,
+                                            pages: Math.ceil(total / limit)
+                                        }
+                                    });
+                                }
+                            }
+                        );
                     });
                 }
             );
@@ -239,8 +272,9 @@ app.get("/orders/:order_id", auth, (req, res) => {
 
             const order = orders[0];
 
+            // Get order items with product details and images
             db.query(
-                "SELECT * FROM order_items WHERE order_id = ?",
+                "SELECT oi.*, p.* FROM order_items oi INNER JOIN products p ON p.product_id = oi.product_id WHERE oi.order_id = ?",
                 [order_id],
                 (err, items) => {
                     if (err) return res.status(500).json({ error: err.message });
@@ -349,7 +383,160 @@ app.get("/payments/:order_id", auth, (req, res) => {
     );
 });
 
-// ============ END ORDER APIS ============
+
+// ============= SELECT ALL ORDERS AT ADMIN PAGE==============================================//
+// GET USER ORDERS
+app.get("/all_orders", auth, (req, res) => {
+    const userId = req.user.id;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    // Get total count
+    db.query(
+        "SELECT COUNT(*) as total FROM orders",
+        (err, countResult) => {
+            if (err) return res.status(500).json({ error: err.message });
+
+            const total = countResult[0].total;
+
+            // Get orders with pagination
+            db.query(
+                "SELECT o.*, p.* FROM orders o LEFT JOIN payments p ON o.order_id = p.order_id ORDER BY o.created_at DESC LIMIT ? OFFSET ?",
+                [limit, offset],
+                (err, orders) => {
+                    if (err) return res.status(500).json({ error: err.message });
+
+                    if (orders.length === 0) {
+                        return res.json({
+                            orders: [],
+                            pagination: {
+                                total,
+                                page,
+                                limit,
+                                pages: Math.ceil(total / limit)
+                            }
+                        });
+                    }
+
+                    // For each order, fetch order-items with product details and images
+                    let completed = 0;
+                    const ordersWithDetails = [];
+
+                    orders.forEach((order, idx) => {
+                        db.query(
+                            "SELECT oi.*, p.* FROM order_items oi INNER JOIN products p ON p.product_id = oi.product_id",
+                            [order.order_id],
+                            (err, items) => {
+                                if (err) {
+                                    ordersWithDetails[idx] = { ...order, items: [] };
+                                } else {
+                                    ordersWithDetails[idx] = { ...order, items };
+                                }
+                                completed++;
+
+                                if (completed === orders.length) {
+                                    res.json({
+                                        orders: ordersWithDetails,
+                                        pagination: {
+                                            total,
+                                            page,
+                                            limit,
+                                            pages: Math.ceil(total / limit)
+                                        }
+                                    });
+                                }
+                            }
+                        );
+                    });
+                }
+            );
+        }
+    );
+});
+
+// GET ORDER DETAIL
+app.get("/all_orders/:order_id", auth, (req, res) => {
+    const { order_id } = req.params;
+    db.query(
+        "SELECT * FROM orders WHERE order_id = ?",
+        [order_id],
+        (err, orders) => {
+            if (err) return res.status(500).json({ error: err.message });
+            if (orders.length === 0) return res.status(404).json({ error: "Order not found" });
+
+            const order = orders[0];
+
+            // Get order items with product details and images
+            db.query(
+                "SELECT oi.*, p.* FROM order_items oi INNER JOIN products p ON p.product_id = oi.product_id",
+                [order_id],
+                (err, items) => {
+                    if (err) return res.status(500).json({ error: err.message });
+
+                    db.query(
+                        "SELECT * FROM payments WHERE order_id = ?",
+                        [order_id],
+                        (err, payments) => {
+                            if (err) return res.status(500).json({ error: err.message });
+
+                            // Lấy voucher nếu có
+                            if (order.voucher_id) {
+                                db.query(
+                                    "SELECT * FROM vouchers WHERE voucher_id = ?",
+                                    [order.voucher_id],
+                                    (err, voucherRows) => {
+                                        if (err) return res.status(500).json({ error: err.message });
+                                        res.json({
+                                            order,
+                                            items,
+                                            payment: payments[0] || null,
+                                            voucher: voucherRows[0] || null
+                                        });
+                                    }
+                                );
+                            } else {
+                                res.json({
+                                    order,
+                                    items,
+                                    payment: payments[0] || null,
+                                    voucher: null
+                                });
+                            }
+                        }
+                    );
+                }
+            );
+        }
+    );
+});
+
+// UPDATE ORDER STATUS
+app.put("/all_orders/:order_id", auth, (req, res) => {
+    const { order_id } = req.params;
+    const { status } = req.body;
+    const userId = req.user.id;
+
+    const validStatuses = ['pending', 'confirmed', 'in_progress', 'shipped', 'in_transit', 'delivered', 'cancelled'];
+    if (!validStatuses.includes(status)) {
+        return res.status(400).json({ error: "Invalid status" });
+    }
+
+    db.query(
+        "UPDATE orders SET status = ? WHERE order_id = ?",
+        [status, order_id],
+        (err, result) => {
+            if (err) return res.status(500).json({ error: err.message });
+            if (result.affectedRows === 0) return res.status(404).json({ error: "Order not found" });
+
+            res.json({ message: "Order status updated successfully", status });
+        }
+    );
+});
+// ============ END SELECT ALL ORDER APIS =============================================//
+
+
+
 
 
 // ============ ADDRESS APIS ============
