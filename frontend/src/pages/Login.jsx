@@ -13,8 +13,6 @@ function Login() {
     
    const { setCurrentUser } = useContext(UserContext);
    const navigate = useNavigate();
-   // Admin URL configurable via Vite env var VITE_ADMIN_URL (set in `frontend/.env` or `.env.local`)
-   const ADMIN_URL = import.meta.env.VITE_ADMIN_URL || 'http://localhost:5174';
 
    const togglePasswordVisibility = () => {
         setPasswordVisible(!passwordVisible);

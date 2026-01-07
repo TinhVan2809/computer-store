@@ -211,7 +211,8 @@ function Carts() {
     return (
       <>
         <NavbarCart />
-
+      <div className="flex mb-15">
+        
         {cart.length > 0 ? <div className="cart-items flex flex-col w-full py-10 px-30 gap-10">
           {cart.map((item) => {
             const price = Number(item.product_price) || 0;
@@ -302,6 +303,7 @@ function Carts() {
             <div className="">Ở đây trống trãi quá.</div>
            )
         }
+      </div>
 
         <SumController
           totalPrice={totalSelectedPrice}

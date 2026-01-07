@@ -58,7 +58,7 @@ function Categories() {
         <div className="">
             <div className="">
                 {categories.map((c) => (
-                    <div className="">
+                    <div className="" key={c.category_id}>
                         <p>{c.category_name}</p>
                     </div>
                 ))}

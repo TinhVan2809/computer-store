@@ -161,24 +161,65 @@ app.post("/orders", auth, (req, res) => {
             if (err) return res.status(500).json({ error: err.message });
 
             const orderId = result.insertId;
+            let itemsProcessed = 0;
 
-            // Insert order items
-            let insertedCount = 0;
-            items.forEach((item) => {
+            // Helper function to send final response
+            const sendFinalResponse = () => {
+                const notificationContent = "Bạn đã đặt hàng thành công.";
                 db.query(
-                    "INSERT INTO order_items (order_id, product_id, product_name, quantity, price) VALUES (?, ?, ?, ?, ?)",
-                    [orderId, item.product_id, item.product_name, item.quantity, item.price],
-                    (err) => {
-                        if (err) {
-                            console.error("Error inserting order item:", err);
-                        }
-                        insertedCount++;
-                        if (insertedCount === items.length) {
+                    "INSERT INTO notifications (user_id, order_id, content) VALUES (?, ?, ?)",
+                    [userId, orderId, notificationContent],
+                    (notificationErr) => {
+                        if (notificationErr) {
+                            console.error("Error inserting notification:", notificationErr);
+                            // Even if notification fails, the order was created.
+                            // Send a success response for the order but log the notification error.
+                            // A more robust system might try to re-queue this notification.
+                            res.status(201).json({
+                                message: "Order created, but notification failed.",
+                                order_id: orderId,
+                                status: "pending"
+                            });
+                        } else {
+                            // All good, send the final success response
                             res.status(201).json({
                                 message: "Order created successfully",
                                 order_id: orderId,
                                 status: "pending"
                             });
+                        }
+                    }
+                );
+            };
+
+            // If there are no items, which is checked before, but as a safeguard
+            if (items.length === 0) {
+                sendFinalResponse();
+                return;
+            }
+            
+            // Insert order items
+            items.forEach((item) => {
+                db.query(
+                    "INSERT INTO order_items (order_id, product_id, product_name, quantity, price) VALUES (?, ?, ?, ?, ?)",
+                    [orderId, item.product_id, item.product_name, item.quantity, item.price],
+                    (itemErr) => {
+                        if (itemErr) {
+                            // If an item fails, we should ideally roll back the transaction.
+                            // Since we aren't using transactions here, we'll log the error.
+                            // And we will stop further processing for this request.
+                            console.error("Error inserting order item:", itemErr);
+                            // Avoid sending multiple error responses
+                            if (!res.headersSent) {
+                                return res.status(500).json({ error: "Failed to save order items." });
+                            }
+                        }
+                        
+                        itemsProcessed++;
+
+                        // When all items have been processed
+                        if (itemsProcessed === items.length) {
+                           sendFinalResponse();
                         }
                     }
                 );

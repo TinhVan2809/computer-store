@@ -20,6 +20,9 @@ function Payments() {
   const [addressList, setAddressList] = useState(false);
   const [addressCurrentPage, setAddressCurrentPage] = useState(0);
 
+  // State quản lý toast thông báo đặt hàng thành công.
+  const [successOrder, setSuccessOrder] = useState(false);
+
   // State quản lý form địa chỉ mới
   const [newAddress, setNewAddress] = useState({
     recipient_name: "",
@@ -366,8 +369,9 @@ function Payments() {
           status: "pending",
         });
 
-        alert("Đặt hàng thành công! Vui lòng chờ xác nhận từ cửa hàng.");
-        navigate(`/orders/${orderId}`);
+        navigate(`/orders/${orderId}`, {
+          state: { orderSuccess: true },
+        });
       } else if (paymentMethod === "momo") {
         handleMomoPayment(orderId, total);
       } else if (paymentMethod === "vnpay") {

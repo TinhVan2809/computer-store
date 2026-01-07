@@ -1,5 +1,5 @@
-import { useContext, useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useContext, useEffect, useState, useCallback } from "react";
+import { useParams, useNavigate, Link, useLocation } from "react-router-dom";
 import UserContext from "../context/UserContext";
 import API from "../api/api";
 import '../styles/order-detail.css'
@@ -7,11 +7,20 @@ import '../styles/order-detail.css'
 function OrderDetail() {
   const { orderId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { currentUser } = useContext(UserContext);
   const [order, setOrder] = useState(null);
   const [items, setItems] = useState([]);
   const [payment, setPayment] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
+
+  // STATE LƯU ORER_ID
+  const [selectedOrderId, setSelectedOrderId] = useState([]);
+
+  // State lưu trạng thái modal xác nhận hủy đơn hàng
+  const [cancelOrder, setCancelOrder] = useState(false);
+
 
   const formatter = new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -33,47 +42,73 @@ function OrderDetail() {
     shipped: "#20b2aa",
     in_transit: "#3cb371",
     delivered: "#228b22",
-    cancelled: "#dc143c",
+    // cancelled: "#dc143c",
   };
+
+
+ const fetchOrderDetail = useCallback(async () => {
+  setLoading(true);
+  try {
+    const response = await API.get(`/orders/${orderId}`);
+
+    const orderData = response.data.order || {};
+    if (response.data.voucher) {
+      orderData.voucher = response.data.voucher;
+    }
+
+    setOrder(orderData);
+    setItems(response.data.items || []);
+    setPayment(response.data.payment);
+  } catch (error) {
+    console.error("Error fetching order detail:", error);
+    alert("Lỗi khi tải chi tiết đơn hàng");
+    navigate("/orders");
+  } finally {
+    setLoading(false);
+  }
+}, [orderId, navigate]);
+
+  useEffect(() => {
+    if (location.state?.orderSuccess) {
+      setShowSuccessToast(true);
+      const timer = setTimeout(() => {
+        setShowSuccessToast(false);
+        // Clean up the state from location history
+        navigate(location.pathname, { replace: true, state: {} });
+      }, 3000); // Hide after 3 seconds
+
+      return () => clearTimeout(timer);
+    }
+  }, [location.state, location.pathname, navigate]);
 
   useEffect(() => {
     if (orderId && currentUser?.id) {
       fetchOrderDetail();
     }
-  }, [orderId, currentUser?.id]);
+  }, [orderId, currentUser?.id, fetchOrderDetail]);
 
-  const fetchOrderDetail = async () => {
-    setLoading(true);
-    try {
-      const response = await API.get(`/orders/${orderId}`);
-      // Merge voucher into order if present
-      const orderData = response.data.order || {};
-      if (response.data.voucher) {
-        orderData.voucher = response.data.voucher;
-      }
-      setOrder(orderData);
-      setItems(response.data.items || []);
-      setPayment(response.data.payment);
-    } catch (error) {
-      console.error("Error fetching order detail:", error);
-      alert("Lỗi khi tải chi tiết đơn hàng");
-      navigate("/orders");
-    } finally {
-      setLoading(false);
-    }
-  };
+
+  
+  const onCancelOrder = (order_id) => {
+    setCancelOrder(true);
+    setSelectedOrderId(order_id)
+  }
+
+  const onCancelCanelOrder = () => {
+    setCancelOrder(false);
+    setSelectedOrderId(null)
+  }
 
   const handleCancelOrder = async () => {
-    if (window.confirm("Bạn chắc chắn muốn hủy đơn hàng này?")) {
       try {
-        await API.put(`/orders/${orderId}`, { status: "cancelled" });
-        alert("Hủy đơn hàng thành công");
+        await API.put(`/orders/${selectedOrderId}`, { status: "cancelled" });
+        setCancelOrder(false);
         fetchOrderDetail();
       } catch (error) {
         console.error("Error cancelling order:", error);
         alert("Lỗi khi hủy đơn hàng");
       }
-    }
+    
   };
 
   const handleReturnOrder = () => {
@@ -103,6 +138,12 @@ function OrderDetail() {
   }
 
   return (
+    <>
+    {showSuccessToast && (
+      <div className="success-toast">
+        Đặt hàng thành công!
+      </div>
+    )}
     <div className="order-detail-page">
       <div className="order-detail-container">
         {/* ========== HEADER ========== */}
@@ -269,7 +310,7 @@ function OrderDetail() {
               {order.status === "pending" || order.status === "confirmed" ? (
                 <button
                   className="action-btn cancel-btn"
-                  onClick={handleCancelOrder}
+                  onClick={() => onCancelOrder(order.order_id)}
                 >
                   Hủy đơn hàng
                 </button>
@@ -296,7 +337,7 @@ function OrderDetail() {
 
             {/* Thông tin đơn hàng */}
             <div className="detail-box">
-              <h3>ℹ️ Thông tin</h3>
+              <h3>Thông tin</h3>
               <div className="info-item">
                 <span className="label">Ngày đặt:</span>
                 <span className="value">
@@ -319,15 +360,46 @@ function OrderDetail() {
                     ? "Đã gửi hàng"
                     : order.status === "delivered"
                     ? "Đã giao"
-                    : "Đã hủy"}
+                    : (<> <div className="flex gap-2 items-center"> <span className="bg-[#dc143c] text-white py-1 px-2 rounded-2xl text-md">Đã hủy</span> <Link className="text-white bg-black text-md py-1 px-2 rounded-2xl">Mua lại</Link>  </div> </>)
+                    }
                 </span>
+
+                
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+                  
+      {/* MODAL XÁC NHẬN MUỐN HỦY ĐƠN */}
+      {cancelOrder && (
+        <>
+          <div className="cancelorer-container w-full h-full flex justify-center items-center fixed top-0 z-200">
+            <div className="bg-white rounded-sm flex flex-col py-5 px-10 gap-5 w-fit">
+              <div className="flex flex-col gap-2 justify-center items-center w-full">
+                <h3 className="text-xl">Bạn muốn hủy đơn hàng này?</h3>
+                <span className="text-sm text-gray-700">Lý do hủy:</span>
+              </div>
+              <div className="w-full flex flex-col gap-3">
+                <Link className="border border-stone-200 py-2 px-2" href="javaScript:void(0)"><i class="ri-map-pin-line"></i> Chỉnh sửa địa chỉ nhận hàng</Link>
+                <Link className="border border-stone-200 py-2 px-2" href="javaScript:void(0)"><i class="ri-arrow-left-right-line"></i> Tôi cần thay đổi sản phẩm có trong đơn hàng này</Link>
+                <Link className="border border-stone-200 py-2 px-2" href="javaScript:void(0)"><i class="ri-inbox-2-line"></i> Tôi muốn xem xét thêm về sản phẩm trong đơn hàng</Link>
+                
+                <label className="text-gray-800 text-sm">Lý do khác:</label>
+                <textarea placeholder="Nhập lý do hủy của bạn." className="w-full h-30 border border-gray-200 outline-0 rounded-sm text-sm py-2 px-4"/>
+              </div>
+              <div className="flex w-full justify-end items-center gap-4">
+                <button className="py-2 px-3 rounded-sm cursor-pointer duration-200 border border-gray-300 hover:opacity-90" onClick={onCancelCanelOrder}>Đóng</button>
+                <button className="py-2 px-3 rounded-sm cursor-pointer duration-200 bg-red-500 text-white hover:opacity-70" onClick={handleCancelOrder}>Xác nhận</button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+</>
   );
 }
 
 export default OrderDetail;
+

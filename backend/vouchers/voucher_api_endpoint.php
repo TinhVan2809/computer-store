@@ -46,13 +46,13 @@ function sendJson($payload, int $status = 200) {
 }
     try{
         $action = $_REQUEST['action'] ?? null;
-    $action = is_string($action) ? trim(filter_var($action, FILTER_SANITIZE_FULL_SPECIAL_CHARS)) : null;
+        $action = is_string($action) ? trim(filter_var($action, FILTER_SANITIZE_FULL_SPECIAL_CHARS)) : null;
 
-    if (!$action) {
-        sendJson(['success' => false, 'message' => 'No action specified'], 400);
-    }
+        if (!$action) {
+            sendJson(['success' => false, 'message' => 'No action specified'], 400);
+        }
 
-    $vouchersObj = new Voucher_class();
+        $vouchersObj = new Voucher_class();
 
     switch($action) {
 
