@@ -52,19 +52,63 @@ class Review_class
         }
     }
 
-    public function getAllReviewsByProduct() {
+    public function getAllReviewsByProduct(int $product_id, int $limit = 10, $offset = 0) {
+          if(!$product_id) {
+                return false;
+            }
         try{
             $db = Database::getInstance();
             $connection = $db->getConnection();
 
-            $sql = "SELECT user_id, product_id, rating, comment, image FROM votes WHERE product_id = ?";
+            $sql = "SELECT v.*, u.username, u.avata, u.user_id FROM votes v LEFT JOIN users u ON u.user_id = v.user_id WHERE v.product_id = :product_id  ORDER BY created_at DESC LIMIT :limit OFFSET :offset";
             $get = $connection->prepare($sql);
+            $get->bindValue(':product_id', $product_id, PDO::PARAM_INT);
+            $get->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $get->bindValue(':offset', $offset, PDO::PARAM_INT);
             $get->execute();
             return $get->fetchAll(PDO::FETCH_OBJ);
              
         } catch(PDOException $e) {
             error_log("Error get All Reviews by product");
             return [];
+        }
+    }
+
+    public function countReviewsByProduct(int $product_id ) {
+            if(!$product_id) {
+                return false;
+            }
+            try{
+                $db = Database::getInstance();
+                $connection = $db->getConnection();
+                $sql = "SELECT COUNT(*) as total_reviews FROM votes WHERE product_id = :product_id";
+                $stmt = $connection->prepare($sql);
+                $stmt->bindValue(':product_id', $product_id, PDO::PARAM_INT);
+                $stmt->execute();
+
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                return isset($row['total_reviews']) ? (int)$row['total_reviews'] : 0;
+                
+            } catch(PDOException $e) {
+                error_log("error counting ewviews by product " . $e->getMessage());
+                return [];
+            }  
+       }
+
+             public function deleteReview($vote_id) {
+                try {
+                    $db = Database::getInstance();
+                    $connection = $db->getConnection();
+                    
+                    $sql = "DELETE FROM votes WHERE vote_id = :vote_id";
+                    $stmt = $connection->prepare($sql);
+                    $stmt->bindValue(':vote_id', $vote_id, PDO::PARAM_INT);
+                    $stmt->execute();
+                    
+                    return $stmt->rowCount() > 0;
+                } catch (PDOException $e) {
+                    error_log("Error deleting reviews: " . $e->getMessage());
+                    return false;
         }
     }
 }
