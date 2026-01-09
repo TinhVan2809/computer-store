@@ -5,6 +5,8 @@ import API from "../api/api";
 import "../styles/orders.css";
 
 function Orders() {
+  const IMAGES =
+    "http://localhost/computer-store/backend/uploads/products_img/";
   const navigate = useNavigate();
   const { currentUser } = useContext(UserContext);
   const [orders, setOrders] = useState([]);
@@ -114,25 +116,41 @@ function Orders() {
             Tất cả
           </button>
           <button
-            className={`filter-btn ${statusFilter === "pending" ? "active" : ""}`}
+            className={`filter-btn ${
+              statusFilter === "pending" ? "active" : ""
+            }`}
             onClick={() => setStatusFilter("pending")}
           >
             Chờ xác nhận
           </button>
           <button
-            className={`filter-btn ${statusFilter === "confirmed" ? "active" : ""}`}
+            className={`filter-btn ${
+              statusFilter === "confirmed" ? "active" : ""
+            }`}
             onClick={() => setStatusFilter("confirmed")}
           >
             Đã xác nhận
           </button>
           <button
-            className={`filter-btn ${statusFilter === "delivered" ? "active" : ""}`}
+            className={`filter-btn ${
+              statusFilter === "In transit" ? "active" : ""
+            }`}
+            onClick={() => setStatusFilter("In transit")}
+          >
+            Đang giao
+          </button>
+          <button
+            className={`filter-btn ${
+              statusFilter === "delivered" ? "active" : ""
+            }`}
             onClick={() => setStatusFilter("delivered")}
           >
             Đã giao
           </button>
           <button
-            className={`filter-btn ${statusFilter === "cancelled" ? "active" : ""}`}
+            className={`filter-btn ${
+              statusFilter === "cancelled" ? "active" : ""
+            }`}
             onClick={() => setStatusFilter("cancelled")}
           >
             Đã hủy
@@ -173,18 +191,58 @@ function Orders() {
 
                 <div className="order-address">
                   <p>
-                    <strong>{order.recipient_name}</strong> | {order.recipient_phone}
+                    <strong>{order.recipient_name}</strong> |{" "}
+                    {order.recipient_phone}
                   </p>
                   <p>
-                    {order.specific_address}, {order.ward_name},
+                    {order.specific_address}, {order.ward_name},{" "}
                     {order.district_name}, {order.province_name}
                   </p>
                 </div>
 
-                <div className="order-total">
-                  <span className="label">Tổng cộng:</span>
-                  <span className="amount">{formatter.format(order.total_amount)}</span>
+                <div className="order_product_items border-t border-gray-200">
+                  {order.items.map((item) => (
+                    <>
+                      <div
+                        className="product-item flex gap-3 items-center cursor-pointer"
+                        key={item.order_item_id}
+                        onClick={() => navigate(`/detail/${item.product_id}`)}
+                      >
+                        <div className="product-image">
+                          <img
+                            src={`${IMAGES}/${item.image_main}`}
+                            alt={item.product_name}
+                            className="w-20 h-auto"
+                          />
+                        </div>
+                        <div className="product-details">
+                          <p className="product-name text-sm">
+                            {item.product_name}
+                          </p>
+                          <div className="flex justify-start items-end gap-1">
+                            <p className="product-quantity text-[13px] text-gray-500">
+                              x{item.quantity}
+                            </p>
+                            <p className="font-bold text-red-500 text-sm">
+                              {formatter.format(item.price)}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  ))}
                 </div>
+
+                <div className="order-total">
+                    <span className="label">Tổng cộng:</span>
+                    <span className="line-through text-gray-400 text-sm">
+                      {formatter.format(order.total_amount)}
+                    </span>
+                    <span className="amount">
+                      {formatter.format(order.amount)}
+                    </span>
+                </div>
+
 
                 <div className="order-actions">
                   <button
@@ -193,7 +251,8 @@ function Orders() {
                   >
                     Xem chi tiết
                   </button>
-                  {order.status === "pending" || order.status === "confirmed" ? (
+                  {order.status === "pending" ||
+                  order.status === "confirmed" ? (
                     <button
                       className="action-btn cancel-btn"
                       onClick={() => handleCancelOrder(order.order_id)}

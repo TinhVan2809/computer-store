@@ -164,6 +164,18 @@ try {
 
             default: echo json_encode(['success' => false, 'message' => 'invalid action. ' . htmlspecialchars($action)]);
             break;
+
+            case 'getId':
+                 $user_id = filter_input(INPUT_POST, 'user_id', FILTER_VALIDATE_INT) ?: filter_input(INPUT_GET, 'user_id', FILTER_VALIDATE_INT);
+                if (!$user_id) sendJson(['success' => false, 'message' => 'user_id required'], 400);
+
+                 $data = $userObj->getUserId($user_id);
+
+                sendJson([
+                    'success' => true,
+                    'data' => $data,   
+                ]);
+            break;
         }
 
     } else {

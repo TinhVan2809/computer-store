@@ -5,15 +5,22 @@ import API from "../api/api";
 import '../styles/order-detail.css'
 
 function OrderDetail() {
+
   const { orderId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const { currentUser } = useContext(UserContext);
   const [order, setOrder] = useState(null);
   const [items, setItems] = useState([]);
+  const [similar, setSimilar] = useState([]);
   const [payment, setPayment] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showSuccessToast, setShowSuccessToast] = useState(false);
+
+  const [productIds, setProductIds] = useState([]); // state lưu danh sách id products
+
+  const IMAGES_PRODUCT = 'http://localhost/computer-store/backend/uploads/products_img';
+
 
   // STATE LƯU ORER_ID
   const [selectedOrderId, setSelectedOrderId] = useState([]);
@@ -59,6 +66,8 @@ function OrderDetail() {
     setOrder(orderData);
     setItems(response.data.items || []);
     setPayment(response.data.payment);
+    setProductIds(response.data.items.map(i => i.product_id));
+
   } catch (error) {
     console.error("Error fetching order detail:", error);
     alert("Lỗi khi tải chi tiết đơn hàng");
@@ -81,12 +90,44 @@ function OrderDetail() {
     }
   }, [location.state, location.pathname, navigate]);
 
+  
+  // [SIMILAR] lấy sản phẩm tương tự 
+  const API_SIMILAR = 'http://localhost/computer-store/backend/similar/similar_api_endpoint.php';
+  const fetchSimilarProducts = useCallback(async () => {
+    try {
+      const representativeId = productIds[0];
+
+      const response = await fetch(
+        `${API_SIMILAR}?product_id=${representativeId}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP ERROR: ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (data.status === 'success') {
+        setSimilar(data.data.slice(0, 5));
+      }
+    } catch (error) {
+      console.error("Error fetching similar products", error);
+    }
+  }, [productIds]);
+
+
+
   useEffect(() => {
     if (orderId && currentUser?.id) {
       fetchOrderDetail();
     }
+    
   }, [orderId, currentUser?.id, fetchOrderDetail]);
 
+  useEffect(() => {
+    if (productIds.length > 0) {
+      fetchSimilarProducts();
+    }
+  }, [productIds, fetchSimilarProducts]);
 
   
   const onCancelOrder = (order_id) => {
@@ -136,6 +177,7 @@ function OrderDetail() {
       </div>
     );
   }
+
 
   return (
     <>
@@ -225,6 +267,7 @@ function OrderDetail() {
                 {items.map((item) => (
                   <div key={item.order_item_id} className="item-row">
                     <div className="item-name">
+                      <img className="w-20 h-auto" src={`${IMAGES_PRODUCT}/${item.image_main}`} title={item.product_name} />
                       <p>{item.product_name}</p>
                       <small>x{item.quantity}</small>
                     </div>
@@ -354,8 +397,8 @@ function OrderDetail() {
                     ? "Chờ xác nhận"
                     : order.status === "confirmed"
                     ? "Đã xác nhận"
-                    : order.status === "in_progress"
-                    ? "Đang xử lý"
+                    : order.status === "in transit"
+                    ? "Đang giao"
                     : order.status === "shipped"
                     ? "Đã gửi hàng"
                     : order.status === "delivered"
@@ -366,6 +409,15 @@ function OrderDetail() {
 
                 
               </div>
+            </div>
+            <div className="detail-box">
+             <div className="flex flex-col gap-1">
+                <p className="text-sm text-gray-700">Để tránh các cuộc gọi lừa đảo mạo danh shipper, vui lòng: </p>
+                <span className="text-sm text-gray-600">Không chuyển khoản cho shipper khi chưa nhận hàng.</span>
+                <span className="text-sm text-gray-600">Chỉ chuyển tiền khi nhận hàng.</span>
+                <span className="text-sm text-gray-600">Hãy kiểm tra kỹ đơn hàng trước khi thanh toán.</span>
+                <span className="text-sm text-gray-600">Chi tiết vui lòng liên hệ <Link to="/contact" className="text-black underline">Tại đây</Link></span>
+             </div>
             </div>
           </div>
         </div>
@@ -397,9 +449,49 @@ function OrderDetail() {
           </div>
         </>
       )}
+
+
+      {/* CÓ THỂ BẠN CŨNG THÍCH */}
+      
+        {/* không truyền luôn category_id từ frontend
+        User có thể sửa URL → lấy sai sản phẩm
+        Mất tính bảo mật logic
+        Backend mất quyền kiểm soát */}
+
+      <div className="w-full mt-10 border-t pt-5">
+        <h3 className="text-xl font-bold mb-5 text-gray-800">Có thể bạn cũng thích</h3>
+        {similar.length > 0 ? (
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {similar.map((s) => (
+              <div
+                key={s.product_id}
+                className="bg-white border border-gray-200 rounded-xl p-3 cursor-pointer hover:shadow-lg transition-all duration-300"
+                onClick={() => navigate(`/detail/${s.product_id}`)}
+              >
+                <div className="w-full h-40 flex justify-center items-center mb-3">
+                  <img
+                    src={`http://localhost/computer-store/backend/uploads/products_img/${s.image_main}`}
+                    alt={s.product_name}
+                    className="h-full object-contain"
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <p className="text-sm font-medium text-gray-700 line-clamp-2 h-10 overflow-hidden">
+                    {s.product_name}
+                  </p>
+                  <p className="text-red-500 font-bold text-sm">
+                    {formatter.format(s.product_price)}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-500">Không có sản phẩm tương tự.</p>
+        )}
+      </div>
 </>
   );
 }
 
 export default OrderDetail;
-

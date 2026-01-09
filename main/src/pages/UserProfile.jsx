@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
  import { useParams } from "react-router-dom";
 function UserProfile() {
-    const {user_id} = useParams();
+    const {user_id} = useParams(); // id của người dùng này 
     console.log('User ID received in Profile:', user_id);
 
-    const URL_BASE_ORDER = 'http://localhost/computer-store/backend/orders/order_api_endpoint.php';
+    const URL_BASE_ORDER = 'http://localhost/computer-store/backend/orders/order_api_endpoint.php'; // ORDER
+    const URL_BASE_USER = 'http://localhost/computer-store/backend/users/user_api_endpoint.php';
     const LIMIT = 10;
 
     const [orders, setOrders] = useState();
@@ -13,7 +14,11 @@ function UserProfile() {
     const [currentPage, setCurrentPage] = useState(0);
     const [totalCount, setTotalCount] = useState(0);
 
-    // Lấy danh sách order của người dùng này
+    // State lưu thông tin dữ liệu người dùng này 
+    const [user, setUser] = useState([]);
+
+
+    // [ORDERS] Lấy danh sách order của người dùng này
     const fetchOrderUserData = useCallback( async (page = 1) => {
         setLoading(true);
         try{
@@ -36,21 +41,36 @@ function UserProfile() {
         }
     }, [user_id]);
 
+    // [USER]
+    const fetchUserData = useCallback(async () => {
+        setLoading(true);
+        try{
+            const response = await fetch(`${URL_BASE_USER}?action=getId&user_id=${user_id}`);
+
+            if (!response.ok) {
+                throw new Error('Error HTTP: ', response.status);
+            }
+
+            const data = await response.json();
+            if(data.success) 
+            {
+                setUser(data.data);
+                setLoading(false);
+            }
+        } catch(error) {
+            console.error("Error geting user data ", error);
+        }
+    }, [user_id]);
 
 // CÓ thể fetch nhiều thứ ở đây
     useEffect(() => {
         fetchOrderUserData();
-    }, [user_id, fetchOrderUserData]);
+        fetchUserData();
+    }, [user_id, fetchOrderUserData, fetchUserData]);
 
     return (
         <>
-           <div className="">
-            {orders.map((o) => (
-                <div className="" key={o.order_id}>
-                    <p>{o.order_id}</p>
-                </div>
-            ))}
-           </div>
+          
         </>
     );
 }

@@ -395,6 +395,26 @@ class Users_class {
         }
     }
 
+    // Lấy chi dữ liệu chi tiết của một user
+    public function getUserId($user_id) {
+        $user_id = (int)$user_id;
+        if ($user_id <= 0) return false;
+
+        try{
+            $db = Database::getInstance();
+            $connection = $db->getConnection();
+
+            $sql = "SELECT * FROM users WHERE user_id = :user_id";
+            $stmt = $connection->prepare($sql);
+            $stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_OBJ);
+        } catch(PDOException $e) {
+            error_log("Error geting user id " . $e->getMessage());
+            return [];
+        }
+    }
+
 }
 
 ?>

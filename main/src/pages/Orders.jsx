@@ -60,7 +60,7 @@ function Orders() {
                     {orders.map((o) => (
                         <div className="">
                             <p>{o.order_id}</p>
-                            <button onClick={() => navigate(`/orders/${o.order_id}`)}>Chi tiết</button>
+                            <button onClick={() => navigate(`/order-detail/${o.order_id}`)}>Chi tiết</button>
                         </div>
                     ))}
                 </div>

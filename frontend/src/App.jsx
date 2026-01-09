@@ -17,6 +17,7 @@ import Notifications from './pages/Notifications';
 import Payments from './components/Payments/Payments';
 import Orders from './pages/Orders';
 import OrderDetail from './pages/OrderDetail';
+import Contact from './pages/Contact';
 
 
 //STYLES
@@ -41,6 +42,7 @@ function App() {
         <Route path="/payments" element={<Payments />} />
         <Route path="/orders" element={<Orders />} />
         <Route path="/orders/:orderId" element={<OrderDetail />} />
+        <Route path='/contact' element={<Contact />} />
       </Routes>
 
   </>

@@ -147,7 +147,7 @@
 
 /* Order Address */
 .order-address {
-  padding: 0 20px 15px;
+  padding: 15px 20px;
 }
 
 .order-address p {
@@ -159,6 +159,11 @@
 .order-address p:first-child {
   font-weight: 600;
   color: #333;
+}
+
+/* Order items */
+.order_product_items{
+   padding: 15px 20px;
 }
 
 /* Order Total */
