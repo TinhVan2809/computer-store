@@ -26,8 +26,21 @@ function Banners() {
         fetchBanners();
     }, []);
 
+    const shimmerStyles = `
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        .skeleton-shimmer {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+    `;
+
     return (
         <div className="banner-container relative">
+            <style>{shimmerStyles}</style>
             {/*className = 'swiper-container'*/}
             <Swiper
                 modules={[Navigation, Pagination, Autoplay]}
@@ -42,7 +55,9 @@ function Banners() {
                         <img src={`${IMAGE_URL}${banner.image}`} alt={`Banner ${banner.banner_id}`} className='w-full h-full object-cover'/>
                     </SwiperSlide>
                 )) : (
-                    <SwiperSlide><div className="w-full h-[300px] bg-gray-200 flex items-center justify-center">Loading banners...</div></SwiperSlide>
+                    <SwiperSlide>
+                        <div className="w-full h-[300px] skeleton-shimmer"></div>
+                    </SwiperSlide>
                 )}
             </Swiper>
             <div className="absolute top-5 z-10 flex justify-center items-center w-full">

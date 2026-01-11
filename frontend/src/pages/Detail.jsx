@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import UserContext from "../context/UserContext";
 import "../styles/Detail.css";
@@ -51,6 +51,29 @@ function Detail() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const fetchReviews = useCallback(async () => {
+    if (!product_id) return;
+    try {
+      const offset = (currentPage - 1) * LIMIT;
+      const response = await fetch(
+        `${API_REVIEWS}?action=get&product_id=${product_id}&limit=${LIMIT}&offset=${offset}`
+      );
+
+      if (!response.ok) {
+        throw new Error("ERROR HTTP " + response.status);
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        setReviews(data.data);
+        setTotalPages(data.total_pages || 1);
+      }
+    } catch (error) {
+      console.error("Error getting Reviews ", error);
+    }
+  }, [product_id, currentPage]);
+
   useEffect(() => {
     if (!product_id) return;
 
@@ -92,32 +115,6 @@ function Detail() {
       }
     };
 
-    const fetchReviews = async () => {
-      try {
-        const offset = (currentPage - 1) * LIMIT;
-        const response = await fetch(
-          `${API_REVIEWS}?action=get&product_id=${product_id}&limit=${LIMIT}&offset=${offset}`,
-          { signal: controller.signal }
-        );
-
-        if (!response.ok) {
-          throw new Error("ERROR HTTP " + response.status);
-        }
-
-        const data = await response.json();
-
-        if (data.success) {
-          setReviews(data.data);
-          setTotalPages(data.total_pages || 1);
-        }
-      } catch (error) {
-        if (error.name !== "AbortError") {
-          setError(error.message);
-          console.error("Error getting Reviews ", error);
-        }
-      }
-    };
-
     if (currentPage === 1) {
       fetchDetailProduct();
     }
@@ -126,7 +123,7 @@ function Detail() {
     return () => {
       controller.abort();
     };
-  }, [product_id, currentPage]);
+  }, [product_id, currentPage, fetchReviews]);
 
   if (loading && currentPage === 1) return <div>Loading...</div>;
   if (error) return <div className="error">Something went wrong: {error}</div>;
@@ -223,9 +220,7 @@ function Detail() {
         setDeleteReviewCofirm(false);
         setSelectedReviewId(null);
 
-        // Không thể fetch lại review sau khi xóa vì đang nằm trong phạm vi useEffect, tạm thời dùng window.reload 
-      // fetchReviews();
-      window.location.reload();
+        fetchReviews();
       }
     } catch (error) {
       console.error("Error deleting review ", error);
