@@ -87,6 +87,27 @@ try{
             ]);
             break;
 
+            case 'this_month':
+               
+                $data = $orders->takeTheBestSellingThisMonth();
+
+                sendJson([
+                    'success' => true,
+                    'data' => $data
+                ]);
+            break;
+
+            case 'last_month':
+                
+                $data = $orders->takeTheBestSellingLastMonth();
+
+                sendJson([
+                    'success' => true,
+                    'data' => $data
+                ]);
+            break;
+
+
              default:
             sendJson(['success' => false, 'message' => 'Invalid action: ' . htmlspecialchars($action)], 400);
             break;

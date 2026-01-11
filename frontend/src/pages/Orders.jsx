@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UserContext from "../context/UserContext";
 import API from "../api/api";
@@ -40,7 +40,7 @@ function Orders() {
     cancelled: "#dc143c",
   };
 
-  const fetchOrders = async (page = 1) => {
+  const fetchOrders =  useCallback (async (page = 1) => {
     if (!currentUser?.id) return;
 
     setLoading(true);
@@ -68,13 +68,13 @@ function Orders() {
     } finally {
       setLoading(false);
     }
-  };
+  },[statusFilter, currentUser?.id]);
 
   useEffect(() => {
     if (currentUser?.id) {
       fetchOrders(1);
     }
-  }, [currentUser?.id, statusFilter]);
+  }, [currentUser?.id, statusFilter, fetchOrders]);
 
   const handleViewDetail = (orderId) => {
     navigate(`/orders/${orderId}`);
