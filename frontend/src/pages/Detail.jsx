@@ -193,9 +193,7 @@ function Detail() {
       if (result.success) {
         refreshCartCount(); // Cập nhật số lượng trên Navbar
       }
-    } catch (error) {
-      console.error("Failed to add product to cart:", error);
-      alert("Đã có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng.");
+    } catch (error) {      console.error("Failed to add product to cart:", error);
     }
   };
 
@@ -368,7 +366,6 @@ function Detail() {
       {/* REVIEWS */}
       <div className="w-full flex mt-10">
         <div className="w-full flex flex-col gap-4 p-20 ">
-          <h2 className="text-2xl font-bold mb-4">Customer Reviews</h2>
           {reviews.length > 0 ? (
             <>
               {reviews.map((r) => (

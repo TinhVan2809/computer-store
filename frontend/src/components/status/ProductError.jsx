@@ -5,7 +5,7 @@ export default function ProductError( {error} ) {
     }
     return (
         <>
-            <div className="w-100 m-auto mt-10 flex flex-col gap-2">
+            <div className="w-100 m-auto mt-10 flex flex-col gap-2 py-10" >
                 <img className="w-20 h-auto" src="/public/images/error.png" />
                 <p>Something went wrong <a className="text-red-500 underline" href="#">{error}</a></p>
                 <span>Check your Internet or reload your page</span>

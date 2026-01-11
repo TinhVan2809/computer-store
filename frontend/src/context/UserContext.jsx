@@ -8,7 +8,12 @@ const UserContext = createContext();
 export const UserProvider = ({ children }) => {
     const [currentUser, setCurrentUser] = useState(null);
     const navigate = useNavigate();
+
+    //[CART]
     const [cartItemCount, setCartItemCount] = useState(0);
+
+    //[VOUCHERS]
+    // const [vouchers, setVouchers] = useState([]);
 
     const refreshCartCount = useCallback(async () => {
         if (!currentUser) {
@@ -69,6 +74,28 @@ export const UserProvider = ({ children }) => {
             console.error("Logout failed", error);
         }
     };
+
+    // Fetch danh sách voucher trong giở hành và các page khác cần thiết
+//    useEffect(() => {
+//      const fetchVouchers = async() => {
+//         try{
+//             const res  = await fetch('http://localhost/computer-store/backend/vouchers/voucher_api_endpoint.php?action=get'); // backend php
+            
+//             if(!res.ok) {
+//                 throw new Error("ERROR HTTP: ", res.status);
+//             }
+
+//             const data = await res.json();
+//             if(data.success) {
+//                 setVouchers(data.data); // backend trả về (['success' => true, 'message' => $data]);
+//             }
+//         } catch(error) {
+//             console.error("Error fetching vouchers ", error);
+//         }
+//     }
+//     fetchVouchers();
+//    }, []); // Không cần deps ai đăng nhập cũng lấy.
+
 
     return (
         <UserContext.Provider value={{ currentUser, setCurrentUser, logout, cartItemCount, refreshCartCount }}>

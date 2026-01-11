@@ -15,6 +15,7 @@ import Voucher from './pages/Voucher';
 import Orders from './pages/Orders';
 import UserProfile from './pages/UserProfile';
 import OrderDetail from './pages/OrderDetail';
+import Banners from './pages/Banner';
 
 
 
@@ -36,6 +37,7 @@ function App() {
             <Route path="/orders" element={<Orders />} />
             <Route path='/user-profile/:user_id' element={<UserProfile />}/>
             <Route path='/order-detail/:order_id' element={<OrderDetail />} />
+            <Route path='banners' element={<Banners/>}/>
           </Routes>
         </UserProvider>
       </BrowserRouter>

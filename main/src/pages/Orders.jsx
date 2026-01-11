@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../../../frontend/src/api/api";
 
@@ -18,7 +18,7 @@ function Orders() {
 //   });
 
     
-  const fetchOrders = async (page = 1) => {
+  const fetchOrders = useCallback(async (page = 1) => {
 
 
     setLoading(true);
@@ -46,19 +46,19 @@ function Orders() {
     } finally {
       setLoading(false);
     }
-  };
+  },[statusFilter]);
 
   useEffect(() => {
    
       fetchOrders(1);
-  }, []); // eslint-disable-line
+  }, [fetchOrders, statusFilter]); 
 
     return (
         <>
             <section>
                 <div className="">
                     {orders.map((o) => (
-                        <div className="">
+                        <div className="" key={o.order_id}>
                             <p>{o.order_id}</p>
                             <button onClick={() => navigate(`/order-detail/${o.order_id}`)}>Chi tiết</button>
                         </div>

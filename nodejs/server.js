@@ -165,7 +165,7 @@ app.post("/orders", auth, (req, res) => {
 
             // Helper function to send final response
             const sendFinalResponse = () => {
-                const notificationContent = "Bạn đã đặt hàng thành công.";
+                const notificationContent = "Bạn đã đặt hàng thành công, vui lòng kiểm tra kỹ đơn hàng đã đặt.";
                 db.query(
                     "INSERT INTO notifications (user_id, order_id, content) VALUES (?, ?, ?)",
                     [userId, orderId, notificationContent],

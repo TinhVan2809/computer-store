@@ -17,6 +17,7 @@ function Navbar() {
                         <li><NavLink to='/categories'>Categories</NavLink></li>
                         <li><NavLink to='/vouchers'>Vouchers</NavLink></li>
                         <li><NavLink to='/orders'>Orders</NavLink></li>
+                        <li><NavLink to='/banners'>Banners</NavLink></li>
                     </ul>
                 </nav>
                 <div className="user-logout">
